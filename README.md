@@ -1,0 +1,1 @@
+# plugins-wp24-domain-check
