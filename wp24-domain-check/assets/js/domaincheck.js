@@ -51,7 +51,7 @@ jQuery( function( $ ) {
 				// textfield for domain and select for tld
 				htmlForm += '<input type="text" name="' + settings.fieldnameDomain + '" id="dc-domain-' + id + '"' +
 					' placeholder="' + settings.fieldPlaceholder + '" style="width: ' + settings.fieldWidth + '"' +
-					( '' == settings.textInvalidField.trim() ? ' pattern="^[^_.\\/\\\\<>]{1,63}$"' : '' ) +
+					( '' == settings.textInvalidField.trim() ? ' pattern="^[^@_.\\/\\\\<>]{1,63}$"' : '' ) +
 					( '' == settings.textEmptyField.trim() ? ' required' : '' ) + '>';
 				if ( ! settings.dotInSelect )
 					htmlForm += '<span class="dot">.</span>';
@@ -74,7 +74,7 @@ jQuery( function( $ ) {
 				// textfield for domain and select for tld
 				htmlForm += '<input type="text" name="' + settings.fieldnameDomain + '" id="dc-domain-' + id + '"' +
 					' placeholder="' + settings.fieldPlaceholder + '" style="width: ' + settings.fieldWidth + '"' +
-					( '' == settings.textInvalidField.trim() && ! settings.multicheck ? ' pattern="^[^_.\\/\\\\<>]{1,63}$"' : '' ) +
+					( '' == settings.textInvalidField.trim() && ! settings.multicheck ? ' pattern="^[^@_.\\/\\\\<>]{1,63}$"' : '' ) +
 					( '' == settings.textEmptyField.trim() ? ' required' : '' ) + '>';
 				if ( ! settings.dotInSelect )
 					htmlForm += '<span class="dot">.</span>';
@@ -106,7 +106,7 @@ jQuery( function( $ ) {
 				// textfield for domain and tld
 				htmlForm += '<input type="text" name="' + settings.fieldnameDomain + '" id="dc-domain-' + id + '"' +
 					' placeholder="' + settings.fieldPlaceholder + '" style="width: ' + settings.fieldWidth + '"' +
-					( '' == settings.textInvalidField.trim() && ! settings.multicheck ? ' pattern="^[^_.\\/\\\\<>]{1,63}(\\.[a-zA-Z0-9\\-]{2,})?(\\.[a-zA-Z0-9]{2,})?$"' : '' ) +
+					( '' == settings.textInvalidField.trim() && ! settings.multicheck ? ' pattern="^[^@_.\\/\\\\<>]{1,63}(\\.[a-zA-Z0-9\\-]{2,})?(\\.[a-zA-Z0-9]{2,})?$"' : '' ) +
 					( '' == settings.textEmptyField.trim() ? ' required' : '' ) + '>';
 				break;
 		}
@@ -210,9 +210,9 @@ jQuery( function( $ ) {
 			}
 
 			// custom invalid field message
-			var regex = '^[^_.\\/\\\\<>]{1,63}$';
+			var regex = '^[^@_.\\/\\\\<>]{1,63}$';
 			if ( 'freetext' == settings.selectionType || 'unlimited' == settings.selectionType )
-				regex = '^[^_.\\/\\\\<>]{1,63}(\\.[a-zA-Z0-9\\-]{2,})?(\\.[a-zA-Z0-9]{2,})?$';
+				regex = '^[^@_.\\/\\\\<>]{1,63}(\\.[a-zA-Z0-9\\-]{2,})?(\\.[a-zA-Z0-9]{2,})?$';
 			if ( '' != settings.textInvalidField.trim() && ! $( '#dc-domain-' + id ).val().match( regex ) && ! settings.multicheck ) {
 				if ( 'overlay' == settings.displayType ) {
 					// remove result div and readd it as modal overlay

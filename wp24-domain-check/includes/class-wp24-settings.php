@@ -2234,7 +2234,7 @@ class WP24_Domain_Check_Settings {
 	 * 
 	 * @return void
 	 */
-	public function uninstall() {
+	public static function uninstall() {
 		global $wpdb;
 
 		// drop tables
