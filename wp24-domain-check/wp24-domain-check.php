@@ -3,7 +3,7 @@
  * Plugin Name: WP24 Domain Check
  * Plugin URI: https://wp24.org/plugins/domain-check
  * Description: Check (whois) domain names for availability. Easy integration via shortcode or widget.
- * Version: 1.10.13
+ * Version: 1.10.14
  * Author: WP24
  * Author URI: https://wp24.org
  * License: GPLv2 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'WP24_DOMAIN_CHECK_VERSION' ) )
-	define( 'WP24_DOMAIN_CHECK_VERSION', '1.10.13' );
+	define( 'WP24_DOMAIN_CHECK_VERSION', '1.10.14' );
 
 if ( ! defined( 'WP24_DOMAIN_CHECK_DATABASE_VERSION' ) )
 	define( 'WP24_DOMAIN_CHECK_DATABASE_VERSION', '1.3.0' );

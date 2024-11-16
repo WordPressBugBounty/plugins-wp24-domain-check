@@ -265,8 +265,8 @@ class WP24_Domain_Check_Domaincheck {
 	 * @return void
 	 */
 	public function whois_query() {
-		$post_domain = sanitize_text_field( $_POST['domain'] );
-		$post_tld = sanitize_text_field( $_POST['tld'] );
+		$post_domain = sanitize_text_field( $_POST['domain'] ?? $_GET['domain'] );
+		$post_tld = sanitize_text_field( $_POST['tld'] ?? $_GET['tld'] );
 
 		// verify ajax request
 		if ( $this->options['useNonces'] && ! check_ajax_referer( 'domain_check', 'n', false ) ) {
@@ -285,7 +285,7 @@ class WP24_Domain_Check_Domaincheck {
 		 * recaptcha
 		 */
 		if ( 'none' != $this->options['recaptcha']['type'] ) {
-			$recaptcha = sanitize_text_field( $_POST['recaptcha'] );
+			$recaptcha = sanitize_text_field( $_POST['recaptcha'] ?? $_GET['recaptcha'] );
 			$recaptcha_error = false;
 			if ( ! isset( $recaptcha ) || empty( $recaptcha ) )
 				$recaptcha_error = true;

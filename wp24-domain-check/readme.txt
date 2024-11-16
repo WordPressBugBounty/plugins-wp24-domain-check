@@ -3,8 +3,8 @@ Contributors: wp24dotorg
 Donate link: https://wp24.org/donate
 Tags: domain check, domain checker, domain, whois
 Requires at least: 5.0
-Tested up to: 6.6
-Stable tag: 1.10.13
+Tested up to: 6.7
+Stable tag: 1.10.14
 Requires PHP: 7.0.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -52,8 +52,10 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 
 == Changelog ==
 
-= 1.10.13 =
+= 1.10.14 =
+* Minor bug fixes
 
+= 1.10.13 =
 * Minor bug fixes
 
 = 1.10.12 =
