@@ -1978,7 +1978,7 @@ class WP24_Domain_Check_Settings {
 		echo '<tr>';
 		echo '<th>' . __( 'TLD', 'wp24-domain-check' ) . '</th>';
 		echo '<td>';
-		echo '<input type="text" placeholder="com" required pattern="([a-zA-Z0-9-]{2,})(\.[a-zA-Z0-9]{2,})?$" name="tld_search" value="' . $tld_search . '">';
+		echo '<input type="text" placeholder="com" required pattern="([a-zA-Z0-9-]{2,})(\.[a-zA-Z0-9]{2,})?$" name="tld_search" value="' . esc_attr( $tld_search ) . '">';
 		echo '&nbsp;';
 		echo '<input type="submit" class="button button-primary" value="' . __( 'Search', 'wp24-domain-check' ) . '">';
 		echo '</td>';
@@ -1987,7 +1987,7 @@ class WP24_Domain_Check_Settings {
 		echo '</form>';
 		if ( ! empty( $tld_search ) ) {
 			// search results
-			echo '<p>' . __( 'Results with', 'wp24-domain-check') . ' <strong>' . $tld_search . '</strong>:</p>';
+			echo '<p>' . __( 'Results with', 'wp24-domain-check') . ' <strong>' . esc_attr( $tld_search ) . '</strong>:</p>';
 			$matches = '';
 			$match_count = 0;
 			foreach ( $whoisservers as $tld => $whoisserver) {

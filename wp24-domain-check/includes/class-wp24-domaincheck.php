@@ -27,6 +27,7 @@ class WP24_Domain_Check {
 	public function init() {
 		add_shortcode( 'wp24_domaincheck', array( $this, 'shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'init',  array( $this, 'load_textdomain' ) );
 
 		require_once( dirname( __DIR__ ) . '/assets/inc/class-domaincheck.php' );
 		$domaincheck = new WP24_Domain_Check_Domaincheck( $this->options );
@@ -145,6 +146,16 @@ class WP24_Domain_Check {
 			WP24_DOMAIN_CHECK_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Load textdomain.
+	 * 
+	 * @return void
+	 */
+	public function load_textdomain() {
+		// textdomain for translations
+		load_plugin_textdomain( 'wp24-domain-check', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 	/**
