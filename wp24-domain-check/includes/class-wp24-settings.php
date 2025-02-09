@@ -79,8 +79,16 @@ class WP24_Domain_Check_Settings {
 			'limit' => -1
 		) );
 		foreach ( $products as $product ) {
-			if ( '' != $product->get_price() )
-				$this->woocommerce_products[ $product->get_id() ] = $product->get_name() . ' (' . $product->get_price_html() . ')';
+			if ( '' != $product->get_price() ) {
+				if ( $product->is_type( 'variable' ) ) {
+					$variations = $product->get_available_variations();
+					foreach ( $variations as $variation ) {
+						$this->woocommerce_products[ $variation[ 'variation_id' ] ] = $product->get_name() . ' #' . $variation[ 'variation_id' ] . ' (' . $variation[ 'price_html' ] . ')';
+					}
+				}
+				else
+					$this->woocommerce_products[ $product->get_id() ] = $product->get_name() . ' (' . $product->get_price_html() . ')';
+			}
 		}
 	}
 
@@ -2213,6 +2221,10 @@ class WP24_Domain_Check_Settings {
 		echo '<tr>';
 		echo '<td>' . __( 'Configure TLDs differing from the settings', 'wp24-domain-check' ) . '</td>';
 		echo '<td><code>[wp24_domaincheck tlds="com, net, org"]</code></td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<td>' . __( 'Add TLDs on top, append remaining afterwards', 'wp24-domain-check' ) . '</td>';
+		echo '<td><code>[wp24_domaincheck top_tlds="com, net, org"]</code></td>';
 		echo '</tr>';
 		echo '<tr>';
 		echo '<td>' . __( 'Directly show the whois data', 'wp24-domain-check' ) . '</td>';

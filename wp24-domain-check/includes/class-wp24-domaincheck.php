@@ -27,7 +27,6 @@ class WP24_Domain_Check {
 	public function init() {
 		add_shortcode( 'wp24_domaincheck', array( $this, 'shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_action( 'init',  array( $this, 'load_textdomain' ) );
 
 		require_once( dirname( __DIR__ ) . '/assets/inc/class-domaincheck.php' );
 		$domaincheck = new WP24_Domain_Check_Domaincheck( $this->options );
@@ -149,16 +148,6 @@ class WP24_Domain_Check {
 	}
 
 	/**
-	 * Load textdomain.
-	 * 
-	 * @return void
-	 */
-	public function load_textdomain() {
-		// textdomain for translations
-		load_plugin_textdomain( 'wp24-domain-check', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-	}
-
-	/**
 	 * Translate text.
 	 * 
 	 * @param string $text
@@ -194,6 +183,7 @@ class WP24_Domain_Check {
 			'id'			=> $this->options['multipleUse'] ? uniqid() : '1',
 			'mode'			=> 'check',
 			'tlds'			=> $this->options['tlds'],
+			'top_tlds'		=> '',
 			'output_type'	=> '',
 			'display_type'	=> $this->options['displayType'],
 			'html_form'		=> $this->options['htmlForm'],
@@ -201,6 +191,13 @@ class WP24_Domain_Check {
 		], $atts, $tag );
 		// id to use shortcode multiple times (accept only alphanumeric characters)
 		$id = preg_replace( '/[^a-z0-9]/i', '', $atts['id'] );
+		$tlds = esc_attr( $atts['tlds'] );
+		if ( isset( $atts['top_tlds'] ) && '' != $atts['top_tlds'] ) {
+			// put top tlds first, then append all other tlds
+			$topTlds = explode( ',', str_replace( ' ', '', esc_attr( $atts['top_tlds'] ) ) );
+			$allTlds = explode( ',', str_replace( ' ', '', $this->options['tlds'] ) );
+			$tlds = implode( ',', array_merge( $topTlds, array_diff( $allTlds, $topTlds ) ) );
+		}
 		// display type from shortcode attributes or options
 		$displayType = esc_attr( $atts['display_type'] );
 
@@ -221,7 +218,8 @@ class WP24_Domain_Check {
 				10,
 				2
 			);
-			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js' );
+			// use timestamp as script version number, to prevent caching issues
+			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js', array(), time() );
 		}
 		if ( 'v3' == $this->options['recaptcha']['type'] )
 			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js?render=explicit' );
@@ -240,7 +238,7 @@ class WP24_Domain_Check {
 			"    fieldnameDomain: '" . $this->options['fieldnameDomain'] . "',\n".
 			"    fieldnameTld: '" . $this->options['fieldnameTld'] . "',\n".
 			"    selectionType: '" . $selectionType . "',\n".
-			"    tlds: '" . ( 'unlimited' == $selectionType ? '' : esc_attr( $atts['tlds'] ) ) . "',\n".
+			"    tlds: '" . ( 'unlimited' == $selectionType ? '' : $tlds ) . "',\n".
 			"    checkAll: " . ( $this->options['checkAll'] && 'unlimited' != $selectionType ? "true" : "false" ) . ",\n".
 			"    checkAllLabel: '" . $this->translate( 'checkAllLabel', $this->options['checkAllLabel'] ) . "',\n".
 			"    checkAllDefault: " . ( $this->options['checkAllDefault'] ? "true" : "false" ) . ",\n".

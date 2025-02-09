@@ -244,9 +244,9 @@ class WP24_Domain_Check_Domaincheck {
 					$func_result = WP24_Domain_Check_Whoisfunctions::$func( $domain, $tld );
 					$json_result = array_merge( $json_result, $func_result );
 				}
-				else if ( isset( $whoisserver['rdap'] ) ) {
+				else if ( 'rdap' == substr( $whoisserver['host'], 0, 4 ) ) {
 					// use rdap (registration data access protocol)
-					$rdap_result = self::rdap( $domain, $tld, $whoisserver['rdap'] );
+					$rdap_result = self::rdap( $domain, $tld, $whoisserver['host'] );
 					$json_result = array_merge( $json_result, $rdap_result );
 				}
 				else {
@@ -394,8 +394,14 @@ class WP24_Domain_Check_Domaincheck {
 				if ( 0 != $product_id ) {
 					$product = wc_get_product( $product_id );
 					$json_data['price'] = $product->get_price_html();
-					if ( $this->options['woocommerce']['addToCartBehaviour'] == 0 )
+					if ( $this->options['woocommerce']['addToCartBehaviour'] == 0 ) {
 						$json_data['link'] = wc_get_cart_url() . '?add-to-cart=' . $product_id . '&domain=' . $json_data['domain'] . '.' . $json_data['tld'];
+						if ( $product->is_type( 'grouped' ) ) {
+							$children = $product->get_children();
+							foreach ( $children as $child )
+								$json_data['link'] .= '&quantity[' . $child . ']=1';
+						}
+					}
 					else
 						$json_data['link'] = $product_id;
 				}
@@ -416,8 +422,14 @@ class WP24_Domain_Check_Domaincheck {
 					if ( 0 != $product_id ) {
 						$product = wc_get_product( $product_id );
 						$json_data['price'] = $product->get_price_html();
-						if ( $this->options['woocommerce']['addToCartBehaviour'] == 0 )
+						if ( $this->options['woocommerce']['addToCartBehaviour'] == 0 ) {
 							$json_data['link'] = wc_get_cart_url() . '?add-to-cart=' . $product_id . '&domain=' . $json_data['domain'] . '.' . $json_data['tld'] . '&transfer';
+							if ( $product->is_type( 'grouped' ) ) {
+								$children = $product->get_children();
+								foreach ( $children as $child )
+									$json_data['link'] .= '&quantity[' . $child . ']=1';
+							}
+						}
 						else
 							$json_data['link'] = $product_id;
 					}
