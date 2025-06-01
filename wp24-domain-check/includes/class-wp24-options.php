@@ -153,7 +153,7 @@ class WP24_Domain_Check_Options {
 			return $this->options_default;
 
 		// backward compatibility with v1.8.1
-		if ( ! isset( $options['woocommerce']['addToCartBehaviour'] ) && $options['woocommerce']['redirectToCart'] )
+		if ( isset( $options['woocommerce'] ) && ! isset( $options['woocommerce']['addToCartBehaviour'] ) && $options['woocommerce']['redirectToCart'] )
 			$options['woocommerce']['addToCartBehaviour'] = 0;
 
 		// merge options with defaults if single options missing

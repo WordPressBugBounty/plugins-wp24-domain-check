@@ -98,67 +98,11 @@ class WP24_Domain_Check_Settings {
 	 * @return void
 	 */
 	public function init() {
-		add_action( 'plugins_loaded', array( $this, 'update_database' ) );
 		add_action( 'upgrader_process_complete', array( $this, 'update_plugin' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_filter( 'plugin_action_links_' . dirname( plugin_basename( __DIR__ ) ) . '/wp24-domain-check.php', array( $this, 'action_links' ) );
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
 		add_action( 'admin_menu', array( $this, 'init_menu' ) );
-	}
-
-	/**
-	 * Check database version and update if necessary.
-	 * 
-	 * @return void
-	 */
-	public function update_database() {
-		if ( ! isset( $this->options['database_version'] ) || 
-			version_compare( $this->options['database_version'], WP24_DOMAIN_CHECK_DATABASE_VERSION ) == -1 ) {
-			global $wpdb;
-
-			$charset_collate = $wpdb->get_charset_collate();
-			
-			$table_name = $wpdb->prefix . 'wp24_whois_queries';
-			$sql[] = "CREATE TABLE $table_name (
-				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-				limit_group varchar(25) NOT NULL,
-				query_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-				query_count smallint(5) DEFAULT 1 NOT NULL,
-				PRIMARY KEY  (id)
-			) $charset_collate;";
-
-			$table_name = $wpdb->prefix . 'wp24_tld_prices_links';
-			$sql[] = "CREATE TABLE $table_name (
-				tld varchar(25) NOT NULL,
-				price varchar(25),
-				link text,
-				price_transfer varchar(25),
-				link_transfer text,
-				PRIMARY KEY  (tld)
-			) $charset_collate;";
-
-			$table_name = $wpdb->prefix . 'wp24_tld_woocommerce';
-			$sql[] = "CREATE TABLE $table_name (
-				tld varchar(25) NOT NULL,
-				product_id_purchase bigint(20),
-				product_id_transfer bigint(20),
-				PRIMARY KEY  (tld)
-			) $charset_collate;";
-
-			$table_name = $wpdb->prefix . 'wp24_whois_servers';
-			$sql[] = "CREATE TABLE $table_name (
-				tld varchar(25) NOT NULL,
-				host varchar(100),
-				status_free varchar(200),
-				PRIMARY KEY  (tld)
-			) $charset_collate;";
-
-			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-			dbDelta( $sql );
-
-			$this->options['database_version'] = WP24_DOMAIN_CHECK_DATABASE_VERSION;
-			update_option( 'wp24_domaincheck', $this->options );
-		}
 	}
 
 	/**
@@ -2239,32 +2183,6 @@ class WP24_Domain_Check_Settings {
 		echo '<td><code>[wp24_domaincheck output_type="check_form"]</code><br><code>[wp24_domaincheck output_type="results"]</code></td>';
 		echo '</tr>';
 		echo '</table>';
-	}
-
-	/**
-	 * Uninstall plugin.
-	 * 
-	 * @return void
-	 */
-	public static function uninstall() {
-		global $wpdb;
-
-		// drop tables
-		$table_name = $wpdb->prefix . 'wp24_whois_queries';
-		$sql = "DROP TABLE IF EXISTS $table_name";
-		$wpdb->query( $sql );
-		$table_name = $wpdb->prefix . 'wp24_tld_prices_links';
-		$sql = "DROP TABLE IF EXISTS $table_name";
-		$wpdb->query( $sql );
-		$table_name = $wpdb->prefix . 'wp24_tld_woocommerce';
-		$sql = "DROP TABLE IF EXISTS $table_name";
-		$wpdb->query( $sql );
-		$table_name = $wpdb->prefix . 'wp24_whois_servers';
-		$sql = "DROP TABLE IF EXISTS $table_name";
-		$wpdb->query( $sql );
-		
-		// delete all settings
-		delete_option( 'wp24_domaincheck' );
 	}
 
 }

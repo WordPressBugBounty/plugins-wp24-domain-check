@@ -1120,6 +1120,7 @@ class WP24_Domain_Check_Whoisservers {
 		'rehab' => array('host' => 'whois.nic.rehab', 'free' => 'domain not found.'),
 		'reise' => array('host' => 'whois.nic.reise', 'free' => 'not found'),
 		'reisen' => array('host' => 'whois.donuts.co', 'free' => 'domain not found.'),
+		'ren' => array('host' => 'whois.nic.ren', 'free' => 'object does not exist'),
 		'rentals' => array('host' => 'whois.donuts.co', 'free' => 'domain not found.'),
 		'repair' => array('host' => 'whois.donuts.co', 'free' => 'domain not found'),
 		'report' => array('host' => 'whois.donuts.co', 'free' => 'domain not found.'),
