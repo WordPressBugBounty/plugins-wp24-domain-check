@@ -344,9 +344,12 @@ class WP24_Domain_Check {
 		$js = preg_replace( '/\s\s+|\n|\t/', '', $js );
 
 		// enqueue scripts only when shortcode is used
-		if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+		if (
+			( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) ||
+			( function_exists( '\Breakdance\Themeless\ThemeDisabler\is_theme_disabled' ) && \Breakdance\Themeless\ThemeDisabler\is_theme_disabled() )
+		) {
 			wp_enqueue_script( 'jquery' );
-			// block theme does not support "wp_add_inline_script"
+			// block theme and breakdance builder do not support "wp_add_inline_script"
 			$html = '<script src="' . plugins_url( 'assets/js/domaincheck.js', dirname( __FILE__ ) ) . '" id="wp24-domaincheck-js"></script>' . PHP_EOL;
 			if ( boolval( $atts['addjs'] ) )
 				$html .= '<script id="wp24-domaincheck-js-after">' . $js . '</script>' . PHP_EOL;
