@@ -346,7 +346,8 @@ class WP24_Domain_Check {
 		// enqueue scripts only when shortcode is used
 		if (
 			( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) ||
-			( function_exists( '\Breakdance\Themeless\ThemeDisabler\is_theme_disabled' ) && \Breakdance\Themeless\ThemeDisabler\is_theme_disabled() )
+			( function_exists( '\Breakdance\Themeless\ThemeDisabler\is_theme_disabled' ) && \Breakdance\Themeless\ThemeDisabler\is_theme_disabled() ) ||
+			'Breakdance Zero Theme' == wp_get_theme()
 		) {
 			wp_enqueue_script( 'jquery' );
 			// block theme and breakdance builder do not support "wp_add_inline_script"

@@ -211,9 +211,16 @@ class WP24_Domain_Check_Domaincheck {
 				// check for custom whois server
 				$row = $wpdb->get_row( "SELECT host, status_free FROM {$wpdb->prefix}wp24_whois_servers WHERE tld = '" . $tld . "'" );
 				if ( null !== $row ) {
-					$whois_result = self::whois( $domain, $tld, $row->host, $row->status_free );
-					$json_result = array_merge( $json_result, $whois_result );
-
+					if ( 'rdap' == substr( $row->host, 0, 4 ) ) {
+						// use rdap (registration data access protocol)
+						$rdap_result = self::rdap( $domain, $tld, $row->host );
+						$json_result = array_merge( $json_result, $rdap_result );
+					}
+					else {
+						// use whois (port 43)
+						$whois_result = self::whois( $domain, $tld, $row->host, $row->status_free );
+						$json_result = array_merge( $json_result, $whois_result );
+					}
 					return $json_result;
 				}
 			}

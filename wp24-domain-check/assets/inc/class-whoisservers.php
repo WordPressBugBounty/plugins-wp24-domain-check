@@ -308,7 +308,7 @@ class WP24_Domain_Check_Whoisservers {
 		'business' => array('host' => 'whois.donuts.co', 'free' => 'domain not found.'),
 		'buy' => array('host' => 'whois.afilias-srs.net', 'free' => 'not found'),
 		'buzz' => array('host' => 'whois.nic.buzz', 'free' => 'no data found'),
-		'bw' => array('host' => 'whois.nic.net.bw', 'free' => 'no object found'),
+		'bw' => array('host' => 'rdap.nic.net.bw', 'free' => 'no object found'),
 		'by' => array('host' => 'whois.cctld.by', 'free' => 'object does not exist'),
 		'bz' => array('host' => 'whois.afilias-grs.info', 'free' => 'not found'),
 		'za.bz' => array('host' => 'whois.afilias-grs.info', 'free' => 'not found'),

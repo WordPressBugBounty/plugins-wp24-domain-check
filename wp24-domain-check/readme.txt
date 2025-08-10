@@ -4,7 +4,7 @@ Donate link: https://wp24.org/donate
 Tags: domaincheck, domain check, domain checker, domain, whois
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.11.2
+Stable tag: 1.11.3
 Requires PHP: 7.0.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -51,6 +51,10 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 13. reCAPTCHA
 
 == Changelog ==
+
+= 1.11.3 =
+* RDAP in custom whois servers
+* Breakdance zero theme fix
 
 = 1.11.2 =
 * Breakdance builder fix
