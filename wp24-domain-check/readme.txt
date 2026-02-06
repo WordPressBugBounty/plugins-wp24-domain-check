@@ -3,8 +3,8 @@ Contributors: wp24dotorg
 Donate link: https://wp24.org/donate
 Tags: domaincheck, domain check, domain checker, domain, whois
 Requires at least: 5.0
-Tested up to: 6.8
-Stable tag: 1.11.3
+Tested up to: 6.9
+Stable tag: 1.12.0
 Requires PHP: 7.0.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,7 +22,8 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 * Define a list of testable TLDs
 * Drop-down list (select the TLD from predefinded list)
 * Free text input (type TLD into domain name field)
-* Over 1,500 supported TLDs
+* Over 1,600 supported TLDs
+* Add custom whois servers
 * Possibility of checking every TLD
 * Internationalized domain name (IDN) support
 * Check all TLDs simultaneously (asynchronous)
@@ -30,7 +31,7 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 * Provide price and purchase link for each TLD
 * WooCommerce integration
 * Responsive design
-* Bot protection with reCAPTCHA (version 2 and 3)
+* Bot protection with Google reCAPTCHA or Cloudflare Turnstile
 * Customization of labels and colors
 * WPML and Polylang compatible
 
@@ -48,9 +49,15 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 10. Prices & Purchase links
 11. WooCommerce
 12. Whois Servers
-13. reCAPTCHA
+13. Captcha
 
 == Changelog ==
+
+= 1.12.0 =
+* Bot protection with Cloudflare Turnstile
+* Translation files removed
+* Fixed some whois servers
+* Minor bug fixes
 
 = 1.11.3 =
 * RDAP in custom whois servers

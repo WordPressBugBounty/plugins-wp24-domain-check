@@ -120,7 +120,7 @@ class WP24_Domain_Check_Options {
 			'size'		=> 'normal',
 			'position'	=> 'bottomright',
 			'score'		=> 0.5,
-			'text'		=> __( 'reCAPTCHA check failed', 'wp24-domain-check' ),
+			'text'		=> __( 'captcha check failed', 'wp24-domain-check' ),
 			'color'		=> '#8c0000',
 		);
 

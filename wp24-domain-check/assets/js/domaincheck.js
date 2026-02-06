@@ -119,7 +119,7 @@ jQuery( function( $ ) {
 			htmlForm += '<button type="button" id="dc-spinner-' + id + '" class="dc-spinner" style="display: none;">' + settings.textButton + '</button>';
 		htmlForm += '</div>';
 
-		// recaptcha
+		// captcha
 		if ( ! settings.recaptcha ) {
 			settings.recaptcha = {
 				type: 'none'
@@ -153,12 +153,33 @@ jQuery( function( $ ) {
 				htmlForm += '<div id="g-recaptcha"></div>';
 				grecaptcha.ready( function() {
 					recaptchaId = grecaptcha.render( 'g-recaptcha', {
-						'sitekey': settings.recaptcha.siteKey,
-						'theme': settings.recaptcha.theme,
-						'size': 'invisible',
-						'badge': settings.recaptcha.position,
-					} ) ;
+						sitekey: settings.recaptcha.siteKey,
+						theme: settings.recaptcha.theme,
+						size: 'invisible',
+						badge: settings.recaptcha.position,
+					} );
 				} );
+				break;
+			case 'turnstile':
+				htmlForm += '<br>';
+				htmlForm += '<div id="cf-turnstile"></div>';
+
+				function turnstileRender() {
+					return turnstile.render( '#cf-turnstile', {
+						sitekey: settings.recaptcha.siteKey,
+						theme: settings.recaptcha.theme,
+						size: settings.recaptcha.size,
+						execution: 'execute',
+						appearance: 'execute',
+						callback: function ( token ) {
+							formSubmit( token );
+						},
+					} );
+				}
+
+				window.onload = function () {
+					recaptchaId = turnstileRender();
+				};
 				break;
 		}
 
@@ -239,6 +260,14 @@ jQuery( function( $ ) {
 				grecaptcha.execute( recaptchaId, { action: 'wp24_domaincheck' } ).then( function( token ) {
 					formSubmit( token );
 				} );
+				return;
+			}
+			else if ( 'turnstile' == settings.recaptcha.type ) {
+				// if render in onload failed, try again
+				if ( ! recaptchaId )
+					recaptchaId = turnstileRender();
+				turnstile.reset( recaptchaId );
+				turnstile.execute( recaptchaId );
 				return;
 			}
 
@@ -449,14 +478,19 @@ jQuery( function( $ ) {
 			else
 				$( '#dc-result-' + id ).html( htmlResult );
 
-			// recaptcha
+			// captcha
 			recaptcha = '';
-			if ( -1 !== ['v2_check', 'v2_badge'].indexOf( settings.recaptcha.type ) ) {
-				recaptcha = grecaptcha.getResponse();
-				grecaptcha.reset();
+			switch ( settings.recaptcha.type ) {
+				case 'v2_check':
+				case 'v2_badge':
+					recaptcha = grecaptcha.getResponse();
+					grecaptcha.reset();
+					break;
+				case 'v3':
+				case 'turnstile':
+					recaptcha = e;
+					break;
 			}
-			else if ( 'v3' == settings.recaptcha.type )
-				recaptcha = e;
 
 			if ( 'gradual_loading' == settings.displayType ) {
 				checkQueueLength = checkQueue.length;

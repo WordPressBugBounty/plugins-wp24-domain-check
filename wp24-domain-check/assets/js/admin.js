@@ -193,12 +193,12 @@ jQuery( function( $ ) {
 		// no size with recaptcha v2_badge/v3
 		$( 'input[name="wp24_domaincheck[recaptcha][size]"]' ).prop( 'disabled', true );
 	}
-	if ( 'v2_check' == $( 'input[name="wp24_domaincheck[recaptcha][type]"]:checked' ).val() ) {
-		// no position with recaptcha v2_check
+	if ( -1 !== ['v2_check', 'turnstile'].indexOf( $( 'input[name="wp24_domaincheck[recaptcha][type]"]:checked' ).val() ) ) {
+		// no position with recaptcha v2_check or cloudflare turnstile
 		$( 'input[name="wp24_domaincheck[recaptcha][position]"]' ).prop( 'disabled', true );
 	}
-	if ( -1 !== ['v2_check', 'v2_badge'].indexOf( $( 'input[name="wp24_domaincheck[recaptcha][type]"]:checked' ).val() ) ) {
-		// no score with recaptcha v2
+	if ( -1 !== ['v2_check', 'v2_badge', 'turnstile'].indexOf( $( 'input[name="wp24_domaincheck[recaptcha][type]"]:checked' ).val() ) ) {
+		// no score with recaptcha v2 or cloudflare turnstile
 		$( 'input[name="wp24_domaincheck[recaptcha][score]"]' ).prop( 'disabled', true );
 	}
 	$( 'input[name="wp24_domaincheck[recaptcha][type]"]' ).change( function() {
@@ -212,12 +212,12 @@ jQuery( function( $ ) {
 			// no size with recaptcha v2_badge/v3
 			$( 'input[name="wp24_domaincheck[recaptcha][size]"]' ).prop( 'disabled', true );
 		}
-		if ( 'v2_check' == val ) {
-			// no position with recaptcha v2_check
+		if ( -1 !== ['v2_check', 'turnstile'].indexOf( val ) ) {
+			// no position with recaptcha v2_check or cloudflare turnstile
 			$( 'input[name="wp24_domaincheck[recaptcha][position]"]' ).prop( 'disabled', true );
 		}
-		if ( -1 !== ['v2_check', 'v2_badge'].indexOf( val ) ) {
-			// no score with recaptcha v2
+		if ( -1 !== ['v2_check', 'v2_badge', 'turnstile'].indexOf( val ) ) {
+			// no score with recaptcha v2 or cloudflare turnstile
 			$( 'input[name="wp24_domaincheck[recaptcha][score]"]' ).prop( 'disabled', true );
 		}
 	} );

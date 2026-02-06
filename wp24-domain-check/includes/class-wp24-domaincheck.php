@@ -206,23 +206,30 @@ class WP24_Domain_Check {
 			return '<div id="dc-result-' . $id . '" class="wp24-dc"></div>';
 
 		// recaptcha
-		if ( in_array( $this->options['recaptcha']['type'], array( 'v2_check', 'v2_badge' ) ) ) {
-			// add "async defer" to recaptcha script tag
-			add_filter(
-				'script_loader_tag',
-				function( $tag, $handle ) {
-					if ( 'recaptcha' !== $handle )
-						return $tag;
-					return str_replace( '></', ' async defer></', $tag );
-				},
-				10,
-				2
-			);
-			// use timestamp as script version number, to prevent caching issues
-			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js', array(), time() );
+		switch ( $this->options['recaptcha']['type'] ) {
+			case 'v2_check':
+			case 'v2_badge':
+				// add "async defer" to recaptcha script tag
+				add_filter(
+					'script_loader_tag',
+					function( $tag, $handle ) {
+						if ( 'recaptcha' !== $handle )
+							return $tag;
+						return str_replace( '></', ' async defer></', $tag );
+					},
+					10,
+					2
+				);
+				// use timestamp as script version number, to prevent caching issues
+				wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js', array(), time() );
+				break;
+			case 'v3':
+				wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js?render=explicit' );
+				break;
+			case 'turnstile':
+				wp_enqueue_script( 'turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit' );
+				break;
 		}
-		if ( 'v3' == $this->options['recaptcha']['type'] )
-			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js?render=explicit' );
 
 		$js = 
 			"jQuery( function( $ ) {\n".

@@ -135,17 +135,22 @@ class WP24_Domain_Check_Domaincheck {
 		}
 		else {
 			$json = json_decode( wp_remote_retrieve_body( $response ) );
+			if ( is_null( $json ) ) {
+				$array_result['status'] = 'error';
+				$array_result['text'] = 'Error result null';
+			}
+			else {
+				// extract the whois data
+				$string = 'Domain: ' . $json->ldhName . PHP_EOL;
+				$string .= 'Status: ' . $json->status[0] . PHP_EOL;
+				foreach ( $json->nameservers as $s )
+					$string .= ucfirst( $s->objectClassName ) . ': ' . $s->ldhName . PHP_EOL;
+				foreach ( $json->events as $s )
+					$string .= ucfirst( $s->eventAction ) . ': ' . $s->eventDate . PHP_EOL;
 
-			// extract the whois data
-			$string = 'Domain: ' . $json->ldhName . PHP_EOL;
-			$string .= 'Status: ' . $json->status[0] . PHP_EOL;
-			foreach ( $json->nameservers as $s )
-				$string .= ucfirst( $s->objectClassName ) . ': ' . $s->ldhName . PHP_EOL;
-			foreach ( $json->events as $s )
-				$string .= ucfirst( $s->eventAction ) . ': ' . $s->eventDate . PHP_EOL;
-
-			$array_result['status'] = 'registered';
-			$array_result['text'] = $string;
+				$array_result['status'] = 'registered';
+				$array_result['text'] = $string;
+			}
 		}
 
 		return $array_result;
@@ -296,8 +301,8 @@ class WP24_Domain_Check_Domaincheck {
 			$recaptcha_error = false;
 			if ( ! isset( $recaptcha ) || empty( $recaptcha ) )
 				$recaptcha_error = true;
-			else
-			{
+			else if ( in_array( $this->options['recaptcha']['type'], array( 'v2_check', 'v2_badge', 'v3' ) ) ) {
+				// Google reCAPTCHA
 				$response = wp_remote_get( 'https://www.google.com/recaptcha/api/siteverify?secret=' . $this->options['recaptcha']['secretKey'] . '&response=' . $recaptcha );
 				$response_json = json_decode( wp_remote_retrieve_body( $response ), true );
 
@@ -320,6 +325,22 @@ class WP24_Domain_Check_Domaincheck {
 					in_array( 'timeout-or-duplicate', $response_json['error-codes'] )
 				)
 					$recaptcha_error = false;
+			}
+			else {
+				// Cloudflare Turnstile
+				$response = wp_remote_post( 'https://challenges.cloudflare.com/turnstile/v0/siteverify', array(
+					'headers' => array(
+						'Content-Type' => 'application/json',
+					),
+					'body' => json_encode( array(
+						'secret' => $this->options['recaptcha']['secretKey'],
+						'response' => $recaptcha
+					) ),
+				) );
+				$response_json = json_decode( wp_remote_retrieve_body( $response ), true );
+
+				if ( ! $response_json['success'] )
+					$recaptcha_error = true;
 			}
 
 			if ( $recaptcha_error ) {

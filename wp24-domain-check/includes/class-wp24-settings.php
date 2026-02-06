@@ -649,8 +649,8 @@ class WP24_Domain_Check_Settings {
 							7200	=> __( '7,200 queries per hour (trusted source)' , 'wp24-domain-check' ),
 						),
 						'desc'		=> __( 'Due to technical conditions, this plugin cannot guarantee to 100% that the query limit will not be exceeded.', 'wp24-domain-check' ) . '<br>' . 
-							__( 'See', 'wp24-domain-check' ) . ': <a href="https://registrar-console.centralnic.com/pub/whois_guidance">' . 
-							'https://registrar-console.centralnic.com/pub/whois_guidance</a><br>' . 
+							__( 'See', 'wp24-domain-check' ) . ': <a href="https://centralnicregistry.com/policies/whois-guidance/">' . 
+							'https://centralnicregistry.com/policies/whois-guidance/</a><br>' . 
 							__( 'Affected TLDs', 'wp24-domain-check' ) . ' (' . count( $this->limited_tlds['centralnic'] ) . '): ' . 
 							implode( ', ', $this->limited_tlds['centralnic'] ),
 					)
@@ -1173,12 +1173,15 @@ class WP24_Domain_Check_Settings {
 				'name'		=> 'recaptcha',
 				'subname'	=> 'type',
 				'type'		=> 'radiobuttons',
-				'desc'		=> __( 'See', 'wp24-domain-check' ) . ': <a href="https://developers.google.com/recaptcha/docs/versions">https://developers.google.com/recaptcha/docs/versions</a>',
+				'desc'		=> __( 'See', 'wp24-domain-check' ) . ':<br>' .
+					'<a href="https://developers.google.com/recaptcha/docs/versions">https://developers.google.com/recaptcha/docs/versions</a>' . '<br>' .
+					'<a href="https://developers.cloudflare.com/turnstile/concepts/widget">https://developers.cloudflare.com/turnstile/concepts/widget</a>',
 				'vals'		=> array(
 					'none'		=> __( 'None' , 'wp24-domain-check' ),
-					'v2_check'	=> __( 'Version 2 ("I\'m not a robot" Checkbox)' , 'wp24-domain-check' ),
-					'v2_badge'	=> __( 'Version 2 (Invisible badge)' , 'wp24-domain-check' ),
-					'v3'		=> __( 'Version 3' , 'wp24-domain-check' ),
+					'v2_check'	=> __( 'Google reCAPTCHA Version 2 ("I\'m not a robot" Checkbox)' , 'wp24-domain-check' ),
+					'v2_badge'	=> __( 'Google reCAPTCHA Version 2 (Invisible badge)' , 'wp24-domain-check' ),
+					'v3'		=> __( 'Google reCAPTCHA Version 3' , 'wp24-domain-check' ),
+					'turnstile'	=> __( 'Cloudflare Turnstile' , 'wp24-domain-check' ),
 				),
 			)
 		);
@@ -1330,7 +1333,7 @@ class WP24_Domain_Check_Settings {
 		$tabs['prices_links'] = __( 'Prices &amp; Links', 'wp24-domain-check' );
 		$tabs['woocommerce'] = __( 'WooCommerce', 'wp24-domain-check' );
 		$tabs['whoisservers'] = __( 'Whois Servers', 'wp24-domain-check' );
-		$tabs['recaptcha'] = __( 'reCAPTCHA', 'wp24-domain-check' );
+		$tabs['recaptcha'] = __( 'Captcha', 'wp24-domain-check' );
 		$tabs['system_info'] = __( 'System Info', 'wp24-domain-check' );
 		$tabs['help'] = __( 'Help', 'wp24-domain-check' );
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'general';
@@ -1352,7 +1355,7 @@ class WP24_Domain_Check_Settings {
 				$this->options['query_limits']['centralnic']
 			);
 			echo '<br>' . __( 'See', 'wp24-domain-check' );
-			echo ': <a href="https://registrar-console.centralnic.com/pub/whois_guidance">https://registrar-console.centralnic.com/pub/whois_guidance</a>';
+			echo ': <a href="https://centralnicregistry.com/policies/whois-guidance/">https://centralnicregistry.com/policies/whois-guidance/</a>';
 			echo '</p></div>';
 
 			// warning for trusted sources
@@ -1370,7 +1373,7 @@ class WP24_Domain_Check_Settings {
 		if ( 'none' != $this->options['recaptcha']['type'] && ( empty( $this->options['recaptcha']['siteKey'] ) || empty( $this->options['recaptcha']['secretKey'] ) ) ) {
 			// error for missing recaptcha site or secret key
 			echo '<div class="notice notice-error is-dismissible"><p>';
-			echo __( 'reCAPTCHA is enabled, but no site or secret key is set.', 'wp24-domain-check' );
+			echo __( 'Captcha is enabled, but no site or secret key is set.', 'wp24-domain-check' );
 			echo '</p></div>';
 		}
 
@@ -1973,7 +1976,7 @@ class WP24_Domain_Check_Settings {
 				if ( ! empty( $host ) && ! empty( $status_free ) ) {
 					$wpdb->replace( $wpdb->prefix . 'wp24_whois_servers', array(
 						'tld' => $tld,
-						'host' => $host,
+						'host' => rtrim($host, '/'),
 						'status_free' => $status_free,
 					) );
 				}
@@ -2094,8 +2097,8 @@ class WP24_Domain_Check_Settings {
 			echo '<tr><th>cURL</th><td><span style="color: #a00">' . __( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		echo '</table>';
 		
-		// server requirements for recaptcha
-		echo '<h2 class="title">' . __( 'Requirements for reCAPTCHA', 'wp24-domain-check' ) . '</h2>';
+		// server requirements for captcha
+		echo '<h2 class="title">' . __( 'Requirements for captcha', 'wp24-domain-check' ) . '</h2>';
 		echo '<table class="form-table">';
 		if ( ini_get('allow_url_fopen') )
 			echo '<tr><th>allow_url_fopen</th><td><span style="color: #0a0">' . __( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
