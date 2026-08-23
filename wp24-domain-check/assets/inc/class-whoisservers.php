@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Class providing whois server informations.
  */

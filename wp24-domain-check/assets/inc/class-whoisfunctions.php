@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Class for special whois functions.
  */
@@ -15,7 +19,7 @@ class WP24_Domain_Check_Whoisfunctions {
 	public static function vn_whois( $domain, $tld ) {
 		$array_result = array();
 
-		$request_url = 'http://www.whois.net.vn/whois.php?domain=' . $domain . '.' . $tld;
+		$request_url = 'http://www.whois.net.vn/whois.php?domain=' . rawurlencode( $domain . '.' . $tld );
 		$response = wp_remote_retrieve_body( wp_remote_get( $request_url ) );
 
 		switch ( intval( $response ) ) {
@@ -26,7 +30,7 @@ class WP24_Domain_Check_Whoisfunctions {
 				$array_result['status'] = 'available';
 				break;
 			case 1:
-				$request_url = 'http://www.whois.net.vn/whois.php?domain=' . $domain . '.' . $tld . '&act=getwhois';
+				$request_url = 'http://www.whois.net.vn/whois.php?domain=' . rawurlencode( $domain . '.' . $tld ) . '&act=getwhois';
 				$response = wp_remote_retrieve_body( wp_remote_get( $request_url ) );
 		
 				$array_result['status'] = 'registered';

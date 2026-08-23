@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Class for changing settings (admin interface).
  */
@@ -1345,16 +1349,18 @@ class WP24_Domain_Check_Settings {
 			// info about query limited domains
 			echo '<div class="notice notice-info is-dismissible"><p>';
 			printf(
-				__( '%1$s TLDs have a query limit: %2$s.', 'wp24-domain-check' ),
-				count( $this->limited_tlds['centralnic'] ),
-				implode( ', ', $this->limited_tlds['centralnic'] )
+				/* translators: %1$s: number of TLDs, %2$s: comma-separated list of query-limited TLDs */
+				esc_html__( '%1$s TLDs have a query limit: %2$s.', 'wp24-domain-check' ),
+				esc_html( count( $this->limited_tlds['centralnic'] ) ),
+				esc_html( implode( ', ', $this->limited_tlds['centralnic'] ) )
 			);
 			echo '<br>';
 			printf(
-				__( 'Only %1$s queries per hour overall are possible for those domains.', 'wp24-domain-check' ),
-				$this->options['query_limits']['centralnic']
+				/* translators: %1$s: number of allowed queries per hour */
+				esc_html__( 'Only %1$s queries per hour overall are possible for those domains.', 'wp24-domain-check' ),
+				esc_html( $this->options['query_limits']['centralnic'] )
 			);
-			echo '<br>' . __( 'See', 'wp24-domain-check' );
+			echo '<br>' . esc_html__( 'See', 'wp24-domain-check' );
 			echo ': <a href="https://centralnicregistry.com/policies/whois-guidance/">https://centralnicregistry.com/policies/whois-guidance/</a>';
 			echo '</p></div>';
 
@@ -1362,7 +1368,8 @@ class WP24_Domain_Check_Settings {
 			if ( $this->options['query_limits']['centralnic'] == 7200 ) {
 				echo '<div class="notice notice-warning is-dismissible"><p>';
 				printf(
-					__( 'CentralNic %1$strusted sources%2$s are those that are present on the access list of a registrar!', 'wp24-domain-check' ),
+					/* translators: %1$s: opening strong tag, %2$s: closing strong tag */
+					esc_html__( 'CentralNic %1$strusted sources%2$s are those that are present on the access list of a registrar!', 'wp24-domain-check' ),
 					'<strong>',
 					'</strong>'
 				);
@@ -1373,7 +1380,7 @@ class WP24_Domain_Check_Settings {
 		if ( 'none' != $this->options['recaptcha']['type'] && ( empty( $this->options['recaptcha']['siteKey'] ) || empty( $this->options['recaptcha']['secretKey'] ) ) ) {
 			// error for missing recaptcha site or secret key
 			echo '<div class="notice notice-error is-dismissible"><p>';
-			echo __( 'Captcha is enabled, but no site or secret key is set.', 'wp24-domain-check' );
+			echo esc_html__( 'Captcha is enabled, but no site or secret key is set.', 'wp24-domain-check' );
 			echo '</p></div>';
 		}
 
@@ -1387,12 +1394,13 @@ class WP24_Domain_Check_Settings {
 				// info about review, donate and help
 				echo '<div class="notice notice-info"><p>';
 				printf(
-					__( 'If you like WP24 Domain Check, leave a positive <a href="%1$s">review</a>, support the development with a <a href="%2$s">donation</a>. Check the <a href="%3$s">forum</a> if you need help or have suggestions for improvements.', 'wp24-domain-check' ),
-					'https://wordpress.org/support/plugin/wp24-domain-check/reviews/?rate=5#new-post',
-					'https://wp24.org/donate',
-					'https://wordpress.org/support/plugin/wp24-domain-check/'
+					/* translators: %1$s: review link, %2$s: donation link, %3$s: forum link */
+					wp_kses( __( 'If you like WP24 Domain Check, leave a positive <a href="%1$s">review</a>, support the development with a <a href="%2$s">donation</a>. Check the <a href="%3$s">forum</a> if you need help or have suggestions for improvements.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+					esc_url( 'https://wordpress.org/support/plugin/wp24-domain-check/reviews/?rate=5#new-post' ),
+					esc_url( 'https://wp24.org/donate' ),
+					esc_url( 'https://wordpress.org/support/plugin/wp24-domain-check/' )
 				);
-				echo ' <a href="' . admin_url( 'options-general.php?page=wp24_domaincheck_settings&tab=' . $active_tab ) . '&dismiss-update-message">' . __( 'Dismiss', 'wp24-domain-check' ) . '</a>.';
+				echo ' <a href="' . esc_url( admin_url( 'options-general.php?page=wp24_domaincheck_settings&tab=' . $active_tab ) . '&dismiss-update-message' ) . '">' . esc_html__( 'Dismiss', 'wp24-domain-check' ) . '</a>.';
 				echo '</p></div>';
 			}
 		}
@@ -1402,7 +1410,7 @@ class WP24_Domain_Check_Settings {
 		foreach ( $tabs as $tab => $label ) {
 			$url = admin_url( 'options-general.php?page=wp24_domaincheck_settings&tab=' . $tab );
 			$active = $tab == $active_tab ? ' nav-tab-active' : '';
-			echo '<a href="' . $url . '" class="nav-tab' . $active . '">' . $label . '</a>';
+			echo '<a href="' . esc_url( $url ) . '" class="nav-tab' . esc_attr( $active ) . '">' . esc_html( $label ) . '</a>';
 		}
 		echo '</h2>';
 		// tab pages
@@ -1410,11 +1418,12 @@ class WP24_Domain_Check_Settings {
 			case 'general':
 				echo '<h2>Shortcode</h2>';
 				echo '<p>';
-				echo __( 'Simply insert this shortcode <code>[wp24_domaincheck]</code> into any post or page to display the domain check.', 'wp24-domain-check' );
+				echo wp_kses( __( 'Simply insert this shortcode <code>[wp24_domaincheck]</code> into any post or page to display the domain check.', 'wp24-domain-check' ), array( 'code' => array() ) );
 				echo '<br>';
 				printf(
-					__( 'All available shortcode options can be found under <a href="%1$s">help</a>.', 'wp24-domain-check' ),
-					'options-general.php?page=wp24_domaincheck_settings&tab=help'
+					/* translators: %1$s: help tab URL */
+					wp_kses( __( 'All available shortcode options can be found under <a href="%1$s">help</a>.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+					esc_url( 'options-general.php?page=wp24_domaincheck_settings&tab=help' )
 				);
 				echo '</p>';
 				echo '<form action="options.php" method="post">';
@@ -1435,7 +1444,7 @@ class WP24_Domain_Check_Settings {
 				echo '</form>';
 				break;
 			case 'texts_colors':
-				echo '<p>' . __( 'Text and colors for the different statuses returned by domain checks.', 'wp24-domain-check' ) . '</p>';
+				echo '<p>' . esc_html__( 'Text and colors for the different statuses returned by domain checks.', 'wp24-domain-check' ) . '</p>';
 				echo '<form action="options.php" method="post">';
 				settings_fields( 'wp24_domaincheck' );
 				do_settings_sections( 'settings_texts_colors' );
@@ -1492,16 +1501,17 @@ class WP24_Domain_Check_Settings {
 
 		switch ( $type ) {
 			case 'textfield':
-				echo '<input type="text" name="' . $fieldname . '" value="' . $value . '" class="regular-text">';
+				echo '<input type="text" name="' . esc_attr( $fieldname ) . '" value="' . esc_attr( $value ) . '" class="regular-text">';
 				break;
 			case 'textarea':
-				echo '<textarea name="' . $fieldname . '" rows="5" cols="50">' . $value . '</textarea>';
+				echo '<textarea name="' . esc_attr( $fieldname ) . '" rows="5" cols="50">' . esc_html( $value ) . '</textarea>';
 				break;
 			case 'checkbox':
 				$label = isset( $args['label'] ) ? $args['label'] : '';
 
-				echo '<label for="' . $fieldname . '">';
-				echo '<input type="checkbox" name="' . $fieldname . '" id="' . $fieldname . '" value="1" ' . checked( $value, 1, false ) . '>';
+				echo '<label for="' . esc_attr( $fieldname ) . '">';
+				echo '<input type="checkbox" name="' . esc_attr( $fieldname ) . '" id="' . esc_attr( $fieldname ) . '" value="1" ' . checked( $value, 1, false ) . '>';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $label is always a literal, already-translated string from settings registration, may contain HTML markup.
 				echo '' != $label ? ' ' . $label : '';
 				echo '</label>';
 				break;
@@ -1509,32 +1519,35 @@ class WP24_Domain_Check_Settings {
 				$vals = isset( $args['vals'] ) ? $args['vals'] : '';
 				foreach ( $vals as $val => $label ) {
 					echo '<p>';
-					echo '<input type="radio" name="' . $fieldname . '" id="' . $name . '_' . $val . '" value="' . $val . '" ' . checked( $value, $val, false ) . '>';
-					echo '<label for="' . $name . '_' . $val . '">' . $label . '</label>';
+					echo '<input type="radio" name="' . esc_attr( $fieldname ) . '" id="' . esc_attr( $name . '_' . $val ) . '" value="' . esc_attr( $val ) . '" ' . checked( $value, $val, false ) . '>';
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $label is always a literal, already-translated string from settings registration, may contain HTML markup.
+					echo '<label for="' . esc_attr( $name . '_' . $val ) . '">' . $label . '</label>';
 					echo '</p>';
 				}
 				break;
 			case 'combobox':
 				$vals = isset( $args['vals'] ) ? $args['vals'] : '';
-				echo '<select name="' . $fieldname . '" style="vertical-align: baseline">';
+				echo '<select name="' . esc_attr( $fieldname ) . '" style="vertical-align: baseline">';
 				foreach ( $vals as $val => $label ) {
-					echo '<option value="' . $val . '"' . selected( $value, $val, false ) . '>' . $label . '</option>';
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $label is always a literal, already-translated string from settings registration, may contain HTML markup.
+					echo '<option value="' . esc_attr( $val ) . '"' . selected( $value, $val, false ) . '>' . $label . '</option>';
 				}
 				echo '</select>';
 				break;
 			case 'numberfield':
-				$max = isset( $args['max'] ) ? ' max="' . $args['max'] . '"' : '';
-				$step = isset( $args['step'] ) ? ' step="' . $args['step'] . '"' : '';
+				$max = isset( $args['max'] ) ? ' max="' . esc_attr( $args['max'] ) . '"' : '';
+				$step = isset( $args['step'] ) ? ' step="' . esc_attr( $args['step'] ) . '"' : '';
 
-				echo '<input type="number" name="' . $fieldname . '" value="' . $value . '" min="0"' . $max . $step . ' class="small-text">';
+				echo '<input type="number" name="' . esc_attr( $fieldname ) . '" value="' . esc_attr( $value ) . '" min="0"' . $max . $step . ' class="small-text">';
 				break;
 			case 'colorfield':
-				echo '<p><input type="text" name="' . $fieldname . '" value="' . $value . '" class="colorPicker"></p>';
+				echo '<p><input type="text" name="' . esc_attr( $fieldname ) . '" value="' . esc_attr( $value ) . '" class="colorPicker"></p>';
 				break;
 		}
 
 		// description text below the field
 		if ( ! empty( $desc ) )
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $desc is always a literal, already-translated string from settings registration, may contain HTML markup.
 			echo '<p class="description">' . $desc . '</p>';
 	}
 
@@ -1693,7 +1706,7 @@ class WP24_Domain_Check_Settings {
 		global $wpdb;
 
 		if ( $this->options['woocommerce']['enabled'] ) {
-			echo '<p>' . __( 'WooCommerce integration enabled, disable to use prices &amp; links.', 'wp24-domain-check' ) . '</p>';
+			echo '<p>' . esc_html__( 'WooCommerce integration enabled, disable to use prices &amp; links.', 'wp24-domain-check' ) . '</p>';
 			return;
 		}
 
@@ -1733,15 +1746,15 @@ class WP24_Domain_Check_Settings {
 				$wpdb->delete( $wpdb->prefix . 'wp24_tld_prices_links', array( 'tld' => $tld ) );
 		}
 
-		echo '<h2 class="title">' . __( 'Individual TLD settings', 'wp24-domain-check' ) . '</h2>';
-		echo '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post">';
+		echo '<h2 class="title">' . esc_html__( 'Individual TLD settings', 'wp24-domain-check' ) . '</h2>';
+		echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
 		echo '<table class="wp-list-table widefat striped">';
 		echo '<thead><tr>';
-		echo '<th>' . __( 'TLD', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'TLD', 'wp24-domain-check' ) . '</th>';
 		if ( $this->options['priceEnabled'] || $this->options['priceTransferEnabled'] )
-			echo '<th>' . __( 'Price', 'wp24-domain-check' ) . '</th>';
+			echo '<th>' . esc_html__( 'Price', 'wp24-domain-check' ) . '</th>';
 		if ( $this->options['linkEnabled'] || $this->options['linkTransferEnabled'] )
-			echo '<th>' . __( 'Link', 'wp24-domain-check' ) . '</th>';
+			echo '<th>' . esc_html__( 'Link', 'wp24-domain-check' ) . '</th>';
 		echo '<th>&nbsp;</th>';
 		echo '</tr></thead>';
 
@@ -1751,25 +1764,25 @@ class WP24_Domain_Check_Settings {
 		if ( $this->options['priceEnabled'] || $this->options['priceTransferEnabled'] ) {
 			echo '<td>';
 			if ( $this->options['priceEnabled'] )
-				echo '<div>' . __( 'Purchase price', 'wp24-domain-check' ) . ':<br><input type="text" name="price" maxlength="25"></div>';
+				echo '<div>' . esc_html__( 'Purchase price', 'wp24-domain-check' ) . ':<br><input type="text" name="price" maxlength="25"></div>';
 			if ( $this->options['priceTransferEnabled'] )
-				echo '<div>' . __( 'Transfer price', 'wp24-domain-check' ) . ':<br><input type="text" name="price_transfer" maxlength="25"></div>';
-			echo '<p class="description">' . __( 'Leave empty to use default price.', 'wp24-domain-check' ) . '</p>';
+				echo '<div>' . esc_html__( 'Transfer price', 'wp24-domain-check' ) . ':<br><input type="text" name="price_transfer" maxlength="25"></div>';
+			echo '<p class="description">' . esc_html__( 'Leave empty to use default price.', 'wp24-domain-check' ) . '</p>';
 			echo '</td>';
 		}
 		if ( $this->options['linkEnabled'] || $this->options['linkTransferEnabled'] ) {
 			echo '<td>';
 			if ( $this->options['linkEnabled'] )
-				echo '<div>' . __( 'Purchase link', 'wp24-domain-check' ) . ':<br><input type="text" class="regular-text" name="link"></div>';
+				echo '<div>' . esc_html__( 'Purchase link', 'wp24-domain-check' ) . ':<br><input type="text" class="regular-text" name="link"></div>';
 			if ( $this->options['linkTransferEnabled'] )
-				echo '<div>' . __( 'Transfer link', 'wp24-domain-check' ) . ':<br><input type="text" class="regular-text" name="link_transfer"></div>';
-			echo '<p class="description">' . __( 'Leave empty to use default link.', 'wp24-domain-check' ) . '<br>' . __( 'Use <strong>[domain]</strong> as placeholder for the domain name.', 'wp24-domain-check' ) . '</p>';
+				echo '<div>' . esc_html__( 'Transfer link', 'wp24-domain-check' ) . ':<br><input type="text" class="regular-text" name="link_transfer"></div>';
+			echo '<p class="description">' . esc_html__( 'Leave empty to use default link.', 'wp24-domain-check' ) . '<br>' . wp_kses( __( 'Use <strong>[domain]</strong> as placeholder for the domain name.', 'wp24-domain-check' ), array( 'strong' => array() ) ) . '</p>';
 			echo '</td>';
 		}
 		echo '<td>';
-		echo '<input type="submit" name="save" class="button button-primary" value="' . __( 'Save', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" name="save" class="button button-primary" value="' . esc_attr__( 'Save', 'wp24-domain-check' ) . '">';
 		echo '&nbsp;';
-		echo '<input type="submit" name="delete" class="button button-secondary" value="' . __( 'Delete', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" name="delete" class="button button-secondary" value="' . esc_attr__( 'Delete', 'wp24-domain-check' ) . '">';
 		echo '</td>';
 		echo '</tr>';
 
@@ -1787,24 +1800,24 @@ class WP24_Domain_Check_Settings {
 			$link_transfer = str_replace( '&', '&amp;', $link_transfer );
 
 			echo '<tr>';
-			echo '<td><strong>' . $tld . '</strong></td>';
+			echo '<td><strong>' . esc_html( $tld ) . '</strong></td>';
 			if ( $this->options['priceEnabled'] || $this->options['priceTransferEnabled'] ) {
 				echo '<td>';
 				if ( $this->options['priceEnabled'] )
-					echo '<div>' . __( 'P', 'wp24-domain-check' ) . ': ' . ( empty( $price ) ? '<span class="dashicons dashicons-warning"></span>' : $price ) . '</div>';
+					echo '<div>' . esc_html__( 'P', 'wp24-domain-check' ) . ': ' . ( empty( $price ) ? '<span class="dashicons dashicons-warning"></span>' : esc_html( $price ) ) . '</div>';
 				if ( $this->options['priceTransferEnabled'] )
-					echo '<div>' . __( 'T', 'wp24-domain-check' ) . ': ' . ( empty( $price_transfer ) ? '<span class="dashicons dashicons-warning"></span>' : $price_transfer ) . '</div>';
+					echo '<div>' . esc_html__( 'T', 'wp24-domain-check' ) . ': ' . ( empty( $price_transfer ) ? '<span class="dashicons dashicons-warning"></span>' : esc_html( $price_transfer ) ) . '</div>';
 				echo '</td>';
 			}
 			if ( $this->options['linkEnabled'] || $this->options['linkTransferEnabled'] ) {
 				echo '<td>';
 				if ( $this->options['linkEnabled'] )
-					echo '<div>' . __( 'P', 'wp24-domain-check' ) . ': ' . ( empty( $link ) ? '<span class="dashicons dashicons-warning"></span>' : $link ) . '</div>';
+					echo '<div>' . esc_html__( 'P', 'wp24-domain-check' ) . ': ' . ( empty( $link ) ? '<span class="dashicons dashicons-warning"></span>' : esc_html( $link ) ) . '</div>';
 				if ( $this->options['linkTransferEnabled'] )
-					echo '<div>' . __( 'T', 'wp24-domain-check' ) . ': ' . ( empty( $link_transfer ) ? '<span class="dashicons dashicons-warning"></span>' : $link_transfer ) . '</div>';
+					echo '<div>' . esc_html__( 'T', 'wp24-domain-check' ) . ': ' . ( empty( $link_transfer ) ? '<span class="dashicons dashicons-warning"></span>' : esc_html( $link_transfer ) ) . '</div>';
 				echo '</td>';
 			}
-			echo '<td><a href="javascript: void(0);" onclick="editTldPriceLink(\'' . $tld . '\', \'' . $price . '\', \'' . $link . '\', \'' . $price_transfer . '\', \'' . $link_transfer . '\'); return false;">' . __( 'Edit', 'wp24-domain-check' ) . '</a></td>';
+			echo '<td><a href="javascript: void(0);" onclick="' . esc_attr( "editTldPriceLink('" . esc_js( $tld ) . "', '" . esc_js( $price ) . "', '" . esc_js( $link ) . "', '" . esc_js( $price_transfer ) . "', '" . esc_js( $link_transfer ) . "'); return false;" ) . '">' . esc_html__( 'Edit', 'wp24-domain-check' ) . '</a></td>';
 			echo '</tr>';
 		}
 		echo '</table>';
@@ -1820,7 +1833,7 @@ class WP24_Domain_Check_Settings {
 		global $wpdb;
 
 		if ( ! class_exists( 'woocommerce' ) ) {
-			echo '<p>' . __( 'WooCommerce plugin is not activated or installed.', 'wp24-domain-check' ) . '</p>';
+			echo '<p>' . esc_html__( 'WooCommerce plugin is not activated or installed.', 'wp24-domain-check' ) . '</p>';
 			return;
 		}
 
@@ -1855,14 +1868,14 @@ class WP24_Domain_Check_Settings {
 				$wpdb->delete( $wpdb->prefix . 'wp24_tld_woocommerce', array( 'tld' => $tld ) );
 		}
 
-		echo '<h2 class="title">' . __( 'Individual TLD settings', 'wp24-domain-check' ) . '</h2>';
-		echo '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post">';
+		echo '<h2 class="title">' . esc_html__( 'Individual TLD settings', 'wp24-domain-check' ) . '</h2>';
+		echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
 		echo '<table class="wp-list-table widefat striped">';
 		echo '<thead><tr>';
-		echo '<th>' . __( 'TLD', 'wp24-domain-check' ) . '</th>';
-		echo '<th>' . __( 'Purchase product', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'TLD', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'Purchase product', 'wp24-domain-check' ) . '</th>';
 		if ( $this->options['woocommerce']['transferEnabled'] )
-			echo '<th>' . __( 'Transfer product', 'wp24-domain-check' ) . '</th>';
+			echo '<th>' . esc_html__( 'Transfer product', 'wp24-domain-check' ) . '</th>';
 		echo '<th>&nbsp;</th>';
 		echo '</tr></thead>';
 
@@ -1872,21 +1885,21 @@ class WP24_Domain_Check_Settings {
 		echo '<td>';
 		echo '<select name="product_id_purchase" style="vertical-align: baseline">';
 		foreach ( $this->woocommerce_products as $product_id => $product_name )
-			echo '<option value="' . $product_id . '">' . $product_name . '</option>';
+			echo '<option value="' . esc_attr( $product_id ) . '">' . esc_html( $product_name ) . '</option>';
 		echo '</select>';
 		echo '</td>';
 		if ( $this->options['woocommerce']['transferEnabled'] ) {
 			echo '<td>';
 			echo '<select name="product_id_transfer" style="vertical-align: baseline">';
 			foreach ( $this->woocommerce_products as $product_id => $product_name )
-				echo '<option value="' . $product_id . '">' . $product_name . '</option>';
+				echo '<option value="' . esc_attr( $product_id ) . '">' . esc_html( $product_name ) . '</option>';
 			echo '</select>';
 			echo '</td>';
 		}
 		echo '<td>';
-		echo '<input type="submit" name="save" class="button button-primary" value="' . __( 'Save', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" name="save" class="button button-primary" value="' . esc_attr__( 'Save', 'wp24-domain-check' ) . '">';
 		echo '&nbsp;';
-		echo '<input type="submit" name="delete" class="button button-secondary" value="' . __( 'Delete', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" name="delete" class="button button-secondary" value="' . esc_attr__( 'Delete', 'wp24-domain-check' ) . '">';
 		echo '</td>';
 		echo '</tr>';
 
@@ -1898,11 +1911,12 @@ class WP24_Domain_Check_Settings {
 			$product_id_transfer = empty( $row->product_id_transfer ) ? 0 : $row->product_id_transfer;
 
 			echo '<tr>';
-			echo '<td><strong>' . $tld . '</strong></td>';
-			echo '<td>' . ( empty( $product_id_purchase ) ? '<span class="dashicons dashicons-warning"></span>' : $this->woocommerce_products[ $product_id_purchase ] ) . '</td>';
+			echo '<td><strong>' . esc_html( $tld ) . '</strong></td>';
+			echo '<td>' . ( empty( $product_id_purchase ) ? '<span class="dashicons dashicons-warning"></span>' : esc_html( $this->woocommerce_products[ $product_id_purchase ] ) ) . '</td>';
 			if ( $this->options['woocommerce']['transferEnabled'] )
-				echo '<td>' . ( empty( $product_id_transfer ) ? '<span class="dashicons dashicons-warning"></span>' :$this->woocommerce_products[ $product_id_transfer ] ) . '</td>';
-			echo '<td><a href="javascript: void(0);" onclick="editTldWooCommerce(\'' . $tld . '\', ' . $product_id_purchase . ', ' . $product_id_transfer . '); return false;">' . __( 'Edit', 'wp24-domain-check' ) . '</a></td>';
+				echo '<td>' . ( empty( $product_id_transfer ) ? '<span class="dashicons dashicons-warning"></span>' : esc_html( $this->woocommerce_products[ $product_id_transfer ] ) ) . '</td>';
+			$onclick = esc_attr( "editTldWooCommerce('" . esc_js( $tld ) . "', " . intval( $product_id_purchase ) . ', ' . intval( $product_id_transfer ) . '); return false;' );
+			echo '<td><a href="javascript: void(0);" onclick="' . $onclick . '">' . esc_html__( 'Edit', 'wp24-domain-check' ) . '</a></td>';
 			echo '</tr>';
 		}
 		echo '</table>';
@@ -1919,52 +1933,53 @@ class WP24_Domain_Check_Settings {
 		require_once( dirname( __DIR__ ) . '/assets/inc/class-whoisservers.php' );
 		$whoisservers = WP24_Domain_Check_Whoisservers::get_whoisservers();
 
-		echo '<h2 class="title">' . __( 'Whois Servers', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Whois Servers', 'wp24-domain-check' ) . '</h2>';
 		echo '<table class="form-table">';
-		echo '<tr><th>' . __( 'Number of servers / TLDs', 'wp24-domain-check' ) . '</th><td>' . count( $whoisservers ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Number of servers / TLDs', 'wp24-domain-check' ) . '</th><td>' . esc_html( count( $whoisservers ) ) . '</td></tr>';
 		echo '</table>';
 
 		// tld search
 		$tld_search = isset( $_POST['tld_search'] ) ? strtolower( sanitize_text_field( $_POST['tld_search'] ) ) : '';
-		echo '<h2 class="title">' . __( 'Find', 'wp24-domain-check' ) . '</h2>';
-		echo '<p>' . __( 'Enter the desired TLD and check if there is an appropriate server.', 'wp24-domain-check' ) . '</p>';
-		echo '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post">';
+		echo '<h2 class="title">' . esc_html__( 'Find', 'wp24-domain-check' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Enter the desired TLD and check if there is an appropriate server.', 'wp24-domain-check' ) . '</p>';
+		echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th>' . __( 'TLD', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'TLD', 'wp24-domain-check' ) . '</th>';
 		echo '<td>';
 		echo '<input type="text" placeholder="com" required pattern="([a-zA-Z0-9-]{2,})(\.[a-zA-Z0-9]{2,})?$" name="tld_search" value="' . esc_attr( $tld_search ) . '">';
 		echo '&nbsp;';
-		echo '<input type="submit" class="button button-primary" value="' . __( 'Search', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" class="button button-primary" value="' . esc_attr__( 'Search', 'wp24-domain-check' ) . '">';
 		echo '</td>';
 		echo '</tr>';
 		echo '</table>';
 		echo '</form>';
 		if ( ! empty( $tld_search ) ) {
 			// search results
-			echo '<p>' . __( 'Results with', 'wp24-domain-check') . ' <strong>' . esc_attr( $tld_search ) . '</strong>:</p>';
+			echo '<p>' . esc_html__( 'Results with', 'wp24-domain-check') . ' <strong>' . esc_html( $tld_search ) . '</strong>:</p>';
 			$matches = '';
 			$match_count = 0;
 			foreach ( $whoisservers as $tld => $whoisserver) {
 				if ( $tld_search == $tld ) {
-					$matches .= '<span style="color: #0a0; font-weight: bold">' . $tld;
+					$matches .= '<span style="color: #0a0; font-weight: bold">' . esc_html( $tld );
 					if ( isset( $whoisserver['host'] ) )
-						$matches .= ' (' . $whoisserver['host'] . ')';
+						$matches .= ' (' . esc_html( $whoisserver['host'] ) . ')';
 					$matches .= '</span><br>';
 					$match_count++;
 				}
 				else if ( preg_match( '/.*' . $tld_search . '.*/', $tld ) ) {
-					$matches .= $tld;
+					$matches .= esc_html( $tld );
 					if ( isset( $whoisserver['host'] ) )
-						$matches .= ' (' . $whoisserver['host'] . ')';
+						$matches .= ' (' . esc_html( $whoisserver['host'] ) . ')';
 					$matches .= '<br>';
 					$match_count++;
 				}
 			}
-			echo '<p>' . $match_count . ' ' . __( 'TLDs', 'wp24-domain-check' ) . '</p>';
+			echo '<p>' . esc_html( $match_count ) . ' ' . esc_html__( 'TLDs', 'wp24-domain-check' ) . '</p>';
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $matches is built entirely from esc_html()'d fragments above.
 			echo $matches;
 		}
-		echo '<p><em>' . __( 'If a TLD is missing or the query returns erroneous results, feel free to contact us.', 'wp24-domain-check' ) . '</em></p>';
+		echo '<p><em>' . esc_html__( 'If a TLD is missing or the query returns erroneous results, feel free to contact us.', 'wp24-domain-check' ) . '</em></p>';
 
 		// save or delete tld
 		if ( isset( $_POST['tld'] ) && ! empty( $_POST['tld'] ) ) {
@@ -1985,17 +2000,18 @@ class WP24_Domain_Check_Settings {
 				$wpdb->delete( $wpdb->prefix . 'wp24_whois_servers', array( 'tld' => $tld ) );
 		}
 
-		echo '<h2 class="title">' . __( 'Custom Whois Servers', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Custom Whois Servers', 'wp24-domain-check' ) . '</h2>';
 		printf(
-			'<p>' . __( 'Instructions how to add a custom whois server can be found <a href="%1$s">here</a>.', 'wp24-domain-check' ) . '</p>',
-			'https://wp24.org/plugins/domain-check/faq.html'
+			/* translators: %1$s: FAQ URL */
+			wp_kses( '<p>' . __( 'Instructions how to add a custom whois server can be found <a href="%1$s">here</a>.', 'wp24-domain-check' ) . '</p>', array( 'p' => array(), 'a' => array( 'href' => array() ) ) ),
+			esc_url( 'https://wp24.org/plugins/domain-check/faq.html' )
 		);
-		echo '<form action="' . $_SERVER['REQUEST_URI'] . '" method="post">';
+		echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
 		echo '<table class="wp-list-table widefat striped">';
 		echo '<thead><tr>';
-		echo '<th>' . __( 'TLD', 'wp24-domain-check' ) . '</th>';
-		echo '<th>' . __( 'Whois server', 'wp24-domain-check' ) . '</th>';
-		echo '<th>' . __( 'Status free', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'TLD', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'Whois server', 'wp24-domain-check' ) . '</th>';
+		echo '<th>' . esc_html__( 'Status free', 'wp24-domain-check' ) . '</th>';
 		echo '<th>&nbsp;</th>';
 		echo '</tr></thead>';
 
@@ -2005,9 +2021,9 @@ class WP24_Domain_Check_Settings {
 		echo '<td><input type="text" required name="host" maxlength="100" class="regular-text"></td>';
 		echo '<td><input type="text" required name="status_free" maxlength="200" class="regular-text"></td>';
 		echo '<td>';
-		echo '<input type="submit" name="save" class="button button-primary" value="' . __( 'Save', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" name="save" class="button button-primary" value="' . esc_attr__( 'Save', 'wp24-domain-check' ) . '">';
 		echo '&nbsp;';
-		echo '<input type="submit" name="delete" class="button button-secondary" value="' . __( 'Delete', 'wp24-domain-check' ) . '">';
+		echo '<input type="submit" name="delete" class="button button-secondary" value="' . esc_attr__( 'Delete', 'wp24-domain-check' ) . '">';
 		echo '</td>';
 		echo '</tr>';
 
@@ -2021,15 +2037,16 @@ class WP24_Domain_Check_Settings {
 
 			echo '<tr>';
 			echo '<td>';
-			echo '<strong>' . $tld . '</strong>';
+			echo '<strong>' . esc_html( $tld ) . '</strong>';
 			if ( isset( $whoisservers[ $tld ] ) ) {
 				$override_whoisservers = true;
 				echo '&nbsp;<span class="dashicons dashicons-warning" aria-hidden="true"></span>';
 			}
 			echo '</td>';
-			echo '<td>' . $host . '</td>';
-			echo '<td>' . $status_free . '</td>';
-			echo '<td><a href="javascript: void(0);" onclick="editTldWhoisServers(\'' . $tld . '\', \'' . $host . '\', \'' . $status_free . '\'); return false;">' . __( 'Edit', 'wp24-domain-check' ) . '</a></td>';
+			echo '<td>' . esc_html( $host ) . '</td>';
+			echo '<td>' . esc_html( $status_free ) . '</td>';
+			$onclick = esc_attr( "editTldWhoisServers('" . esc_js( $tld ) . "', '" . esc_js( $host ) . "', '" . esc_js( $status_free ) . "'); return false;" );
+			echo '<td><a href="javascript: void(0);" onclick="' . $onclick . '">' . esc_html__( 'Edit', 'wp24-domain-check' ) . '</a></td>';
 			echo '</tr>';
 		}
 		echo '</table>';
@@ -2038,7 +2055,7 @@ class WP24_Domain_Check_Settings {
 		if ( $override_whoisservers ) {
 			echo '<p>';
 			echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>&nbsp;';
-			echo __( 'Default plugin settings for this TLD are overridden. Slightly slows down the check speed.', 'wp24-domain-check' );
+			echo esc_html__( 'Default plugin settings for this TLD are overridden. Slightly slows down the check speed.', 'wp24-domain-check' );
 			echo '</p>';
 		}
 
@@ -2056,62 +2073,62 @@ class WP24_Domain_Check_Settings {
 	private function system_info() {
 		// versions informations
 		echo '<table class="form-table">';
-		echo '<tr><th>WP24 Domain Check</th><td>' . WP24_DOMAIN_CHECK_VERSION . '</td></tr>';
-		echo '<tr><th>' . __( 'Database', 'wp24-domain-check' ) . '</th><td>' . WP24_DOMAIN_CHECK_DATABASE_VERSION . '</td></tr>';
+		echo '<tr><th>WP24 Domain Check</th><td>' . esc_html( WP24_DOMAIN_CHECK_VERSION ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Database', 'wp24-domain-check' ) . '</th><td>' . esc_html( WP24_DOMAIN_CHECK_DATABASE_VERSION ) . '</td></tr>';
 		echo '</table>';
-		echo '<h2 class="title">' . __( 'System', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'System', 'wp24-domain-check' ) . '</h2>';
 		echo '<table class="form-table">';
-		echo '<tr><th>WordPress</th><td>' . $GLOBALS['wp_version'] . '</td></tr>';
+		echo '<tr><th>WordPress</th><td>' . esc_html( $GLOBALS['wp_version'] ) . '</td></tr>';
 		if ( class_exists( 'woocommerce' ) )
-			echo '<tr><th>WooCommerce</th><td>' . WC_VERSION . '</td></tr>';
-		echo '<tr><th>PHP</th><td>' . phpversion() . '</td></tr>';
+			echo '<tr><th>WooCommerce</th><td>' . esc_html( WC_VERSION ) . '</td></tr>';
+		echo '<tr><th>PHP</th><td>' . esc_html( phpversion() ) . '</td></tr>';
 		echo '</table>';
 
 		// server requirements for whois queries
-		echo '<h2 class="title">' . __( 'Requirements for whois queries', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Requirements for whois queries', 'wp24-domain-check' ) . '</h2>';
 		echo '<table class="form-table">';
 		if ( function_exists( 'fsockopen' ) )
-			echo '<tr><th>fsockopen</th><td><span style="color: #0a0">' . __( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>fsockopen</th><td><span style="color: #0a0">' . esc_html__( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		else
-			echo '<tr><th>fsockopen</th><td><span style="color: #a00">' . __( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . __( 'PHP function "fsockopen" must be enabled by your hosting provider.', 'wp24-domain-check' ) . '</p></td></tr>';
+			echo '<tr><th>fsockopen</th><td><span style="color: #a00">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . esc_html__( 'PHP function "fsockopen" must be enabled by your hosting provider.', 'wp24-domain-check' ) . '</p></td></tr>';
 		if ( @fsockopen( 'whois.denic.de', 43, $errno, $errstr, 5 ) )
-			echo '<tr><th>Port 43</th><td><span style="color: #0a0">' . __( 'Open', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>Port 43</th><td><span style="color: #0a0">' . esc_html__( 'Open', 'wp24-domain-check' ) . '</span></td></tr>';
 		else
-			echo '<tr><th>Port 43</th><td><span style="color: #a00">' . __( 'Locked', 'wp24-domain-check' ) . '</span><p class="description">' . __( 'Port 43 must be unlocked by your hosting provider.', 'wp24-domain-check' ) . '</p></td></tr>';
+			echo '<tr><th>Port 43</th><td><span style="color: #a00">' . esc_html__( 'Locked', 'wp24-domain-check' ) . '</span><p class="description">' . esc_html__( 'Port 43 must be unlocked by your hosting provider.', 'wp24-domain-check' ) . '</p></td></tr>';
 		echo '</table>';
 
 		// server requirements for rdap queries
-		echo '<h2 class="title">' . __( 'Requirements for RDAP queries', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Requirements for RDAP queries', 'wp24-domain-check' ) . '</h2>';
 		echo '<table class="form-table">';
 		if ( ini_get('allow_url_fopen') )
-			echo '<tr><th>allow_url_fopen</th><td><span style="color: #0a0">' . __( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>allow_url_fopen</th><td><span style="color: #0a0">' . esc_html__( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		else if ( function_exists('curl_init') )
-			echo '<tr><th>allow_url_fopen</th><td><span style="color: #fa0">' . __( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . __( 'Using cURL as fallback.', 'wp24-domain-check' ) . '</p></td></tr>';
+			echo '<tr><th>allow_url_fopen</th><td><span style="color: #fa0">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . esc_html__( 'Using cURL as fallback.', 'wp24-domain-check' ) . '</p></td></tr>';
 		else
-			echo '<tr><th>allow_url_fopen</th><td><span style="color: #a00">' . __( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>allow_url_fopen</th><td><span style="color: #a00">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		if ( function_exists('curl_init') )
-			echo '<tr><th>cURL</th><td><span style="color: #0a0">' . __( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>cURL</th><td><span style="color: #0a0">' . esc_html__( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		else if ( ini_get('allow_url_fopen') )
-			echo '<tr><th>cURL</th><td><span style="color: #fa0">' . __( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . __( 'allow_url_fopen is enabled.', 'wp24-domain-check' ) . '</p></td></tr>';
+			echo '<tr><th>cURL</th><td><span style="color: #fa0">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . esc_html__( 'allow_url_fopen is enabled.', 'wp24-domain-check' ) . '</p></td></tr>';
 		else
-			echo '<tr><th>cURL</th><td><span style="color: #a00">' . __( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>cURL</th><td><span style="color: #a00">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		echo '</table>';
-		
+
 		// server requirements for captcha
-		echo '<h2 class="title">' . __( 'Requirements for captcha', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Requirements for captcha', 'wp24-domain-check' ) . '</h2>';
 		echo '<table class="form-table">';
 		if ( ini_get('allow_url_fopen') )
-			echo '<tr><th>allow_url_fopen</th><td><span style="color: #0a0">' . __( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>allow_url_fopen</th><td><span style="color: #0a0">' . esc_html__( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		else if ( function_exists('curl_init') )
-			echo '<tr><th>allow_url_fopen</th><td><span style="color: #fa0">' . __( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . __( 'Using cURL as fallback.', 'wp24-domain-check' ) . '</p></td></tr>';
+			echo '<tr><th>allow_url_fopen</th><td><span style="color: #fa0">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . esc_html__( 'Using cURL as fallback.', 'wp24-domain-check' ) . '</p></td></tr>';
 		else
-			echo '<tr><th>allow_url_fopen</th><td><span style="color: #a00">' . __( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>allow_url_fopen</th><td><span style="color: #a00">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		if ( function_exists('curl_init') )
-			echo '<tr><th>cURL</th><td><span style="color: #0a0">' . __( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>cURL</th><td><span style="color: #0a0">' . esc_html__( 'Enabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		else if ( ini_get('allow_url_fopen') )
-			echo '<tr><th>cURL</th><td><span style="color: #fa0">' . __( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . __( 'allow_url_fopen is enabled.', 'wp24-domain-check' ) . '</p></td></tr>';
+			echo '<tr><th>cURL</th><td><span style="color: #fa0">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span><p class="description">' . esc_html__( 'allow_url_fopen is enabled.', 'wp24-domain-check' ) . '</p></td></tr>';
 		else
-			echo '<tr><th>cURL</th><td><span style="color: #a00">' . __( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
+			echo '<tr><th>cURL</th><td><span style="color: #a00">' . esc_html__( 'Disabled', 'wp24-domain-check' ) . '</span></td></tr>';
 		echo '</table>';
 	}
 
@@ -2122,67 +2139,72 @@ class WP24_Domain_Check_Settings {
 	 */
 	private function help() {
 		// help
-		echo '<h2 class="title">' . __( 'Help', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Help', 'wp24-domain-check' ) . '</h2>';
 		echo '<p>';
 		printf(
-			__( 'The frequently asked questions (FAQ) can be found <a href="%1$s">here</a>.', 'wp24-domain-check' ),
-			'https://wp24.org/plugins/domain-check/faq.html'
+			/* translators: %1$s: FAQ URL */
+			wp_kses( __( 'The frequently asked questions (FAQ) can be found <a href="%1$s">here</a>.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+			esc_url( 'https://wp24.org/plugins/domain-check/faq.html' )
 		);
 		echo '<br>';
 		printf(
-			__( 'For other questions or problems take a look at the <a href="%1$s">support forum</a>.', 'wp24-domain-check' ),
-			'https://wordpress.org/support/plugin/wp24-domain-check'
+			/* translators: %1$s: support forum URL */
+			wp_kses( __( 'For other questions or problems take a look at the <a href="%1$s">support forum</a>.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+			esc_url( 'https://wordpress.org/support/plugin/wp24-domain-check' )
 		);
 		echo '</p>';
 
 		// review
-		echo '<h2 class="title">' . __( 'Review', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Review', 'wp24-domain-check' ) . '</h2>';
 		echo '<p>';
 		printf(
-			__( 'If you like WP24 Domain Check, <a href="%1$s">click here</a> to leave a positive review.', 'wp24-domain-check' ),
-			'https://wordpress.org/support/plugin/wp24-domain-check/reviews/?rate=5#new-post'
+			/* translators: %1$s: review URL */
+			wp_kses( __( 'If you like WP24 Domain Check, <a href="%1$s">click here</a> to leave a positive review.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+			esc_url( 'https://wordpress.org/support/plugin/wp24-domain-check/reviews/?rate=5#new-post' )
 		);
 		echo '<br>';
 		printf(
-			__( 'In case you do not like it or have suggestions for improvements <a href="%1$s">click here</a> to send a feedback.', 'wp24-domain-check' ),
-			'https://wordpress.org/support/plugin/wp24-domain-check/'
+			/* translators: %1$s: feedback URL */
+			wp_kses( __( 'In case you do not like it or have suggestions for improvements <a href="%1$s">click here</a> to send a feedback.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+			esc_url( 'https://wordpress.org/support/plugin/wp24-domain-check/' )
 		);
 		echo '</p>';
 
 		// support
-		echo '<h2 class="title">' . __( 'Support', 'wp24-domain-check' ) . '</h2>';
+		echo '<h2 class="title">' . esc_html__( 'Support', 'wp24-domain-check' ) . '</h2>';
 		echo '<p>';
-		echo __( 'If you like this plugin, you could honor the work and support the further development with a donation.', 'wp24-domain-check' );
+		echo esc_html__( 'If you like this plugin, you could honor the work and support the further development with a donation.', 'wp24-domain-check' );
 		echo '<br>';
 		printf(
-			__( 'For being listed as a <a href="%1$s">supporter</a> leave your name and URL in the corresponding field when donating.', 'wp24-domain-check' ),
-			'https://wp24.org/supporters'
+			/* translators: %1$s: supporters page URL */
+			wp_kses( __( 'For being listed as a <a href="%1$s">supporter</a> leave your name and URL in the corresponding field when donating.', 'wp24-domain-check' ), array( 'a' => array( 'href' => array() ) ) ),
+			esc_url( 'https://wp24.org/supporters' )
 		);
 		echo '<br><br>';
-		echo '<a href="https://wp24.org/donate" class="button button-primary">' . __( 'Donate', 'wp24-domain-check' ) . '</a>';
+		echo '<a href="https://wp24.org/donate" class="button button-primary">' . esc_html__( 'Donate', 'wp24-domain-check' ) . '</a>';
 		echo '</p>';
 
 		// shortcode
 		echo '<h2 class="title">Shortcode</h2>';
 		echo '<table>';
 		echo '<tr>';
-		echo '<td>' . __( 'Configure TLDs differing from the settings', 'wp24-domain-check' ) . '</td>';
+		echo '<td>' . esc_html__( 'Configure TLDs differing from the settings', 'wp24-domain-check' ) . '</td>';
 		echo '<td><code>[wp24_domaincheck tlds="com, net, org"]</code></td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<td>' . __( 'Add TLDs on top, append remaining afterwards', 'wp24-domain-check' ) . '</td>';
+		echo '<td>' . esc_html__( 'Add TLDs on top, append remaining afterwards', 'wp24-domain-check' ) . '</td>';
 		echo '<td><code>[wp24_domaincheck top_tlds="com, net, org"]</code></td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<td>' . __( 'Directly show the whois data', 'wp24-domain-check' ) . '</td>';
+		echo '<td>' . esc_html__( 'Directly show the whois data', 'wp24-domain-check' ) . '</td>';
 		echo '<td><code>[wp24_domaincheck mode="whois"]</code></td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<td>' . __( 'Deactivate HTML form with submit button', 'wp24-domain-check' ) . '</td>';
+		echo '<td>' . esc_html__( 'Deactivate HTML form with submit button', 'wp24-domain-check' ) . '</td>';
 		echo '<td><code>[wp24_domaincheck html_form="0"]</code></td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<td>' . __( 'Separate output of check form and results', 'wp24-domain-check' ) . '</td>';
+		echo '<td>' . esc_html__( 'Separate output of check form and results', 'wp24-domain-check' ) . '</td>';
 		echo '<td><code>[wp24_domaincheck output_type="check_form"]</code><br><code>[wp24_domaincheck output_type="results"]</code></td>';
 		echo '</tr>';
 		echo '</table>';

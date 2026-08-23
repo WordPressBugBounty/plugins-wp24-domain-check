@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Whois server list.
  */
@@ -27,7 +31,7 @@ class WP24_Domain_Check_Domaincheck {
 
 	/**
 	 * Query a whois server.
-	 * 
+	 *
 	 * @param string $domain
 	 * @param string $tld
 	 * @param string $whoisserver
@@ -41,6 +45,7 @@ class WP24_Domain_Check_Domaincheck {
 		try {
 			// use own error handler to handle also warnings in fsockopen
 			set_error_handler( function ( $severity, $message, $file, $line ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- arguments come from PHP's internal error handler, not user input, and are never echoed.
 				throw new ErrorException( $message, 0, $severity, $file, $line );
 			});
 			$fp = fsockopen( $whoisserver, 43, $errno, $errstr, 30 );
@@ -103,19 +108,29 @@ class WP24_Domain_Check_Domaincheck {
 
 	/**
 	 * Query a rdap server.
-	 * 
-	 * @param string $domain 
-	 * @param string $tld 
-	 * @param string $rdapserver 
+	 *
+	 * @param string $domain
+	 * @param string $tld
+	 * @param string $rdapserver
 	 * @return array Whois entry.
 	 */
 	private function rdap( $domain, $tld, $rdapserver ) {
 		$array_result = array();
 
-		$request_url = 'https://' . $rdapserver . '/domain/' . $domain . '.' . $tld;
+		$request_url = 'https://' . $rdapserver . '/domain/' . rawurlencode( $domain . '.' . $tld );
 
 		// get response and http status code
-		$response = wp_remote_get( $request_url );
+		$response = wp_remote_get( $request_url, array(
+			'timeout'    => 15,
+			'user-agent' => 'WP24 Domain Check/' . WP24_DOMAIN_CHECK_VERSION . '; ' . home_url(),
+		) );
+
+		if ( is_wp_error( $response ) ) {
+			$array_result['status'] = 'error';
+			$array_result['text'] = $response->get_error_message();
+			return $array_result;
+		}
+
 		$http_status_code = wp_remote_retrieve_response_code( $response );
 
 		if ( 200 != $http_status_code ) {
@@ -128,6 +143,10 @@ class WP24_Domain_Check_Domaincheck {
 				// not found
 				$array_result['status'] = 'available';
 			}
+			else if ( 429 == $http_status_code ) {
+				// too many requests
+				$array_result['status'] = 'limit';
+			}
 			else {
 				$array_result['status'] = 'error';
 				$array_result['text'] = 'Error ' . $http_status_code;
@@ -135,18 +154,21 @@ class WP24_Domain_Check_Domaincheck {
 		}
 		else {
 			$json = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( is_null( $json ) ) {
+			if ( is_null( $json ) || ! isset( $json->ldhName ) ) {
 				$array_result['status'] = 'error';
 				$array_result['text'] = 'Error result null';
 			}
 			else {
 				// extract the whois data
 				$string = 'Domain: ' . $json->ldhName . PHP_EOL;
-				$string .= 'Status: ' . $json->status[0] . PHP_EOL;
-				foreach ( $json->nameservers as $s )
-					$string .= ucfirst( $s->objectClassName ) . ': ' . $s->ldhName . PHP_EOL;
-				foreach ( $json->events as $s )
-					$string .= ucfirst( $s->eventAction ) . ': ' . $s->eventDate . PHP_EOL;
+				if ( isset( $json->status[0] ) )
+					$string .= 'Status: ' . $json->status[0] . PHP_EOL;
+				if ( isset( $json->nameservers ) )
+					foreach ( $json->nameservers as $s )
+						$string .= ucfirst( $s->objectClassName ) . ': ' . $s->ldhName . PHP_EOL;
+				if ( isset( $json->events ) )
+					foreach ( $json->events as $s )
+						$string .= ucfirst( $s->eventAction ) . ': ' . $s->eventDate . PHP_EOL;
 
 				$array_result['status'] = 'registered';
 				$array_result['text'] = $string;
@@ -179,8 +201,8 @@ class WP24_Domain_Check_Domaincheck {
 			$tld = $idn->encode( $tld );
 		}
 
-		if ( gethostbyname( $domain . '.' . $tld . '.' ) != $domain . '.' . $tld . '.' ) {
-			// there is a IPv4 address corresponding to the host name
+		if ( gethostbyname( $domain . '.' . $tld . '.' ) != $domain . '.' . $tld . '.' || checkdnsrr( $domain . '.' . $tld, 'NS' ) ) {
+			// there is a IPv4 address or a name server delegation for the host name
 			$array_result['status'] = 'registered';
 		}
 		else {
@@ -205,7 +227,7 @@ class WP24_Domain_Check_Domaincheck {
 		$json_result['domain'] = $domain;
 		$json_result['tld'] = $tld;
 
-		if ( ! preg_match( '/^[^_\.\/]{1,}$/', $domain ) )
+		if ( ! preg_match( '/^[^_\.\/\r\n]{1,}$/', $domain ) )
 			$json_result['status'] = 'invalid';
 		else {
 			// override enabled: check database for whois server first
@@ -214,7 +236,7 @@ class WP24_Domain_Check_Domaincheck {
 				global $wpdb;
 
 				// check for custom whois server
-				$row = $wpdb->get_row( "SELECT host, status_free FROM {$wpdb->prefix}wp24_whois_servers WHERE tld = '" . $tld . "'" );
+				$row = $wpdb->get_row( $wpdb->prepare( "SELECT host, status_free FROM {$wpdb->prefix}wp24_whois_servers WHERE tld = %s", $tld ) );
 				if ( null !== $row ) {
 					if ( 'rdap' == substr( $row->host, 0, 4 ) ) {
 						// use rdap (registration data access protocol)
@@ -236,7 +258,7 @@ class WP24_Domain_Check_Domaincheck {
 				global $wpdb;
 
 				// check for custom whois server
-				$row = $wpdb->get_row( "SELECT host, status_free FROM {$wpdb->prefix}wp24_whois_servers WHERE tld = '" . $tld . "'" );
+				$row = $wpdb->get_row( $wpdb->prepare( "SELECT host, status_free FROM {$wpdb->prefix}wp24_whois_servers WHERE tld = %s", $tld ) );
 				if ( null !== $row ) {
 					$whois_result = self::whois( $domain, $tld, $row->host, $row->status_free );
 					$json_result = array_merge( $json_result, $whois_result );
@@ -303,7 +325,7 @@ class WP24_Domain_Check_Domaincheck {
 				$recaptcha_error = true;
 			else if ( in_array( $this->options['recaptcha']['type'], array( 'v2_check', 'v2_badge', 'v3' ) ) ) {
 				// Google reCAPTCHA
-				$response = wp_remote_get( 'https://www.google.com/recaptcha/api/siteverify?secret=' . $this->options['recaptcha']['secretKey'] . '&response=' . $recaptcha );
+				$response = wp_remote_get( 'https://www.google.com/recaptcha/api/siteverify?secret=' . rawurlencode( $this->options['recaptcha']['secretKey'] ) . '&response=' . rawurlencode( $recaptcha ) );
 				$response_json = json_decode( wp_remote_retrieve_body( $response ), true );
 
 				if ( ! $response_json['success'] )
@@ -372,10 +394,8 @@ class WP24_Domain_Check_Domaincheck {
 
 			if ( ! isset( $this->options['query_limits'] ) ) {
 				// if query limits option is missing add it
-				$this->options = array(
-					'query_limits' => array(
-						'centralnic' => 60,
-					)
+				$this->options['query_limits'] = array(
+					'centralnic' => 60,
 				);
 			}
 
@@ -417,7 +437,7 @@ class WP24_Domain_Check_Domaincheck {
 
 		if ( in_array( $json_data['status'], array( 'available', 'available_probably' ) ) ) {
 			if ( $this->options['woocommerce']['enabled'] ) {
-				$row = $wpdb->get_row( "SELECT product_id_purchase FROM {$wpdb->prefix}wp24_tld_woocommerce WHERE tld = '" . $json_data['tld'] . "'" );
+				$row = $wpdb->get_row( $wpdb->prepare( "SELECT product_id_purchase FROM {$wpdb->prefix}wp24_tld_woocommerce WHERE tld = %s", $json_data['tld'] ) );
 				$product_id = empty( $row->product_id_purchase ) ? $this->options['woocommerce']['productidPurchase'] : $row->product_id_purchase;
 				if ( 0 != $product_id ) {
 					$product = wc_get_product( $product_id );
@@ -435,7 +455,7 @@ class WP24_Domain_Check_Domaincheck {
 				}
 			}
 			else if ( $this->options['priceEnabled'] || $this->options['linkEnabled'] ) {
-				$row = $wpdb->get_row( "SELECT price, link FROM {$wpdb->prefix}wp24_tld_prices_links WHERE tld = '" . $json_data['tld'] . "'" );
+				$row = $wpdb->get_row( $wpdb->prepare( "SELECT price, link FROM {$wpdb->prefix}wp24_tld_prices_links WHERE tld = %s", $json_data['tld'] ) );
 				if ( $this->options['priceEnabled'] )
 					$json_data['price'] = empty( $row->price ) ? $this->options['priceDefault'] : $row->price;
 				if ( $this->options['linkEnabled'] )
@@ -445,7 +465,7 @@ class WP24_Domain_Check_Domaincheck {
 		else if ( in_array( $json_data['status'], array( 'registered' ) ) ) {
 			if ( $this->options['woocommerce']['enabled'] ) {
 				if ( $this->options['woocommerce']['transferEnabled'] ) {
-					$row = $wpdb->get_row( "SELECT product_id_transfer FROM {$wpdb->prefix}wp24_tld_woocommerce WHERE tld = '" . $json_data['tld'] . "'" );
+					$row = $wpdb->get_row( $wpdb->prepare( "SELECT product_id_transfer FROM {$wpdb->prefix}wp24_tld_woocommerce WHERE tld = %s", $json_data['tld'] ) );
 					$product_id = empty( $row->product_id_transfer ) ? $this->options['woocommerce']['productidTransfer'] : $row->product_id_transfer;
 					if ( 0 != $product_id ) {
 						$product = wc_get_product( $product_id );
@@ -464,7 +484,7 @@ class WP24_Domain_Check_Domaincheck {
 				}
 			}
 			else if ( $this->options['priceTransferEnabled'] || $this->options['linkTransferEnabled'] ) {
-				$row = $wpdb->get_row( "SELECT price_transfer, link_transfer FROM {$wpdb->prefix}wp24_tld_prices_links WHERE tld = '" . $json_data['tld'] . "'" );
+				$row = $wpdb->get_row( $wpdb->prepare( "SELECT price_transfer, link_transfer FROM {$wpdb->prefix}wp24_tld_prices_links WHERE tld = %s", $json_data['tld'] ) );
 				if ( $this->options['priceTransferEnabled'] )
 					$json_data['price'] = empty( $row->price_transfer ) ? $this->options['priceTransferDefault'] : $row->price_transfer;
 				if (  $this->options['linkTransferEnabled'] )

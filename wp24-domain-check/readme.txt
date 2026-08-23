@@ -3,9 +3,9 @@ Contributors: wp24dotorg
 Donate link: https://wp24.org/donate
 Tags: domaincheck, domain check, domain checker, domain, whois
 Requires at least: 5.0
-Tested up to: 6.9
-Stable tag: 1.12.0
-Requires PHP: 7.0.0
+Tested up to: 7.1
+Stable tag: 1.12.1
+Requires PHP: 7.4.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,14 +13,14 @@ Check (whois) domain names for availability. Easy integration via shortcode or w
 
 == Description ==
 
-WP24 Domain Check allows users to check domains if they are free for registration. The responsive form could be easily intregrated via shortcode or widget. Labels and colors are customizeable through the settings page.
+WP24 Domain Check allows users to check domains if they are free for registration. The responsive form could be easily integrated via shortcode or widget. Labels and colors are customizable through the settings page.
 
 **Features**
 
 * Easy integration via shortcode or widget
 * Ajax based search (no page reload required)
 * Define a list of testable TLDs
-* Drop-down list (select the TLD from predefinded list)
+* Drop-down list (select the TLD from predefined list)
 * Free text input (type TLD into domain name field)
 * Over 1,600 supported TLDs
 * Add custom whois servers
@@ -37,7 +37,7 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 
 == Screenshots ==
 
-1. Drop-down list (select the TLD from predefinded list)
+1. Drop-down list (select the TLD from predefined list)
 2. Drop-down list grouped
 3. Free text input and multicheck
 4. Check all TLDs simultaneously (asynchronous)
@@ -52,6 +52,10 @@ WP24 Domain Check allows users to check domains if they are free for registratio
 13. Captcha
 
 == Changelog ==
+
+= 1.12.1 =
+* Security fixes
+* Minor bug fixes
 
 = 1.12.0 =
 * Bot protection with Cloudflare Turnstile

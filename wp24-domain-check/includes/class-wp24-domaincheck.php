@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Class to output js, css and html.
  */
@@ -155,10 +159,11 @@ class WP24_Domain_Check {
 	 */
 	private function translate( $name, $text ) {
 		// WPML and Polylang
-		if ( function_exists( 'icl_t' ) ) 
+		if ( function_exists( 'icl_t' ) )
 			return icl_t( 'admin_texts_wp24_domaincheck', '[wp24_domaincheck]' . $name, $text );
 
-		return __( $text );
+		// $text is a user-configurable option value, not a literal translatable string.
+		return $text;
 	}
 
 	/**
@@ -221,12 +226,15 @@ class WP24_Domain_Check {
 					2
 				);
 				// use timestamp as script version number, to prevent caching issues
+				// phpcs:ignore PluginCheck.CodeAnalysis.EnqueuedResourceOffloading.OffloadedContent -- reCAPTCHA must be loaded from Google's own servers to function.
 				wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js', array(), time() );
 				break;
 			case 'v3':
+				// phpcs:ignore PluginCheck.CodeAnalysis.EnqueuedResourceOffloading.OffloadedContent -- reCAPTCHA must be loaded from Google's own servers to function.
 				wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js?render=explicit' );
 				break;
 			case 'turnstile':
+				// phpcs:ignore PluginCheck.CodeAnalysis.EnqueuedResourceOffloading.OffloadedContent -- Turnstile must be loaded from Cloudflare's own servers to function.
 				wp_enqueue_script( 'turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit' );
 				break;
 		}
@@ -352,17 +360,20 @@ class WP24_Domain_Check {
 
 		// enqueue scripts only when shortcode is used
 		if (
+			// phpcs:ignore PluginCheck.CodeAnalysis.Compatibility.wp_function_not_compatible_with_requires_wp -- guarded by function_exists() for the WP 5.0 minimum.
 			( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) ||
 			( function_exists( '\Breakdance\Themeless\ThemeDisabler\is_theme_disabled' ) && \Breakdance\Themeless\ThemeDisabler\is_theme_disabled() ) ||
 			'Breakdance Zero Theme' == wp_get_theme()
 		) {
 			wp_enqueue_script( 'jquery' );
-			// block theme and breakdance builder do not support "wp_add_inline_script"
-			$html = '<script src="' . plugins_url( 'assets/js/domaincheck.js', dirname( __FILE__ ) ) . '" id="wp24-domaincheck-js"></script>' . PHP_EOL;
+			// block theme and breakdance builder do not support "wp_add_inline_script", print the script tags directly instead
+			// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- printed manually because wp_add_inline_script() output is not supported by these themes/builders.
+			$html = '<script src="' . esc_url( plugins_url( 'assets/js/domaincheck.js', dirname( __FILE__ ) ) ) . '" id="wp24-domaincheck-js"></script>' . PHP_EOL;
 			if ( boolval( $atts['addjs'] ) )
 				$html .= '<script id="wp24-domaincheck-js-after">' . $js . '</script>' . PHP_EOL;
 			// add html script code to footer
 			add_action( 'wp_footer', function() use ( $html ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $html is built from esc_url()'d/pre-sanitized values above and must remain raw HTML for the <script> tags.
 				echo $html;
 			} );
 		}

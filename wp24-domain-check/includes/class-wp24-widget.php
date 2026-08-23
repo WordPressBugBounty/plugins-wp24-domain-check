@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit();
+}
+
 /**
  * Class for providing widget functionality.
  */
@@ -28,11 +32,14 @@ class WP24_Domain_Check_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-defined widget wrapper markup, not user input.
 		echo $args['before_widget'];
 		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-defined widget wrapper markup, not user input.
+			echo $args['before_title'] . esc_html( apply_filters( 'widget_title', $instance['title'] ) ) . $args['after_title'];
 		}
 		echo do_shortcode( '[wp24_domaincheck]' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-defined widget wrapper markup, not user input.
 		echo $args['after_widget'];
 	}
 
@@ -46,7 +53,7 @@ class WP24_Domain_Check_Widget extends WP_Widget {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Domain Check', 'wp24-domain-check' );
 		
 		echo '<p>';
-		echo '<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">'. esc_attr_e( 'Title:', 'wp24-domain-check' ) . '</label>';
+		echo '<label for="' . esc_attr( $this->get_field_id( 'title' ) ) . '">'. esc_attr__( 'Title:', 'wp24-domain-check' ) . '</label>';
 		echo '<input class="widefat" id="' . esc_attr( $this->get_field_id( 'title' ) ) . '" name="' . 
 			esc_attr( $this->get_field_name( 'title' ) ) . '" type="text" value="' . esc_attr( $title ) . '">';
 		echo '</p>';
